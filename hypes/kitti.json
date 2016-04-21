@@ -1,0 +1,32 @@
+{
+  "model": {
+    "input_file": "model/kitti_input.py",
+    "arch_file" : "model/VGG8.py",
+    "solver_file" : "model/adam_optimizer.py"
+  },
+
+  "data": {
+    "train_file" : "data_road/train.txt",
+    "val_file" : "data_road/val.txt",
+    "num_examples_per_epoch_for_train" : 100000,
+    "num_examples_per_epoch_for_eval" : 65400,
+    "road_color" : [255,0,255]
+  },
+ 
+  "arch": {
+    "num_classes" : 2,
+    "image_size" : 50,
+    "num_channels" : 3
+  },
+
+  "logging": {
+  },
+
+  "solver": {
+      "opt": null,
+      "batch_size": 64,
+      "epsilon": 0.00001, 
+      "learning_rate": 1e-4, 
+      "max_steps": 100000
+  }
+}
