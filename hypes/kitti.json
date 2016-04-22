@@ -1,8 +1,8 @@
 {
   "model": {
     "input_file": "model/kitti_input.py",
-    "arch_file" : "model/VGG8.py",
-    "solver_file" : "model/adam_optimizer.py"
+    "architecture_file" : "model/VGG8.py",
+    "optimizer_file" : "model/adam_optimizer.py"
   },
 
   "data": {

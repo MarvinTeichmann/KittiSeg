@@ -19,7 +19,7 @@ tf.app.flags.DEFINE_boolean('debug', False, 'Soggy Leaves')
 
 
 # usage: train.py --config=my_model_params.py
-flags.DEFINE_string('config', cfg.default_config,
+flags.DEFINE_string('hypes', cfg.default_config,
                     'File storing model parameters.')
 
 

@@ -1,4 +1,4 @@
-"""Trains, Evaluates and Saves the model network using a Queue."""
+"""Trains, evaluates and saves the model network using a queue."""
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
 from __future__ import division
@@ -29,12 +29,17 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 
 
 def _copy_parameters_to_traindir(input_file, target_name, target_dir):
-    """Helper to copy files defining the network to the saving dir.
+    """
+    Helper to copy files defining the network to the saving dir.
 
-    Args:
-      input_file: name of source file
-      target_name: target name
-      traindir: directory where training data is saved
+    Parameters
+    ----------
+    input_file : str
+        name of source file
+    target_name : str
+        target name
+    traindir : str
+        directory where training data is saved
     """
     target_file = os.path.join(target_dir, target_name)
     copyfile(input_file, target_file)
@@ -66,17 +71,27 @@ def initialize_training_folder(hypes, train_dir):
 
     # TODO: read more about loggers and make file logging neater.
 
-    config_file = tf.app.flags.FLAGS.config
+    config_file = tf.app.flags.FLAGS.hypes
     _copy_parameters_to_traindir(config_file, "hypes.json", target_dir)
     _copy_parameters_to_traindir(
         hypes['model']['input_file'], "data_input.py", target_dir)
     _copy_parameters_to_traindir(
-        hypes['model']['arch_file'], "architecture.py", target_dir)
+        hypes['model']['architecture_file'], "architecture.py", target_dir)
     _copy_parameters_to_traindir(
-        hypes['model']['solver_file'], "solver.py", target_dir)
+        hypes['model']['optimizer_file'], "solver.py", target_dir)
 
 
 def maybe_download_and_extract(hypes, train_dir):
+    """
+    Download the data if it isn't downloaded by now.
+
+    Parameters
+    ----------
+    hypes : dict
+        Hyperparameters
+    train_dir : str
+        Path to the training data directory
+    """
     data_input = imp.load_source("input", hypes['model']['input_file'])
     if hasattr(data_input, 'maybe_download_and_extract'):
         target_dir = os.path.join(train_dir, "model_files")
@@ -85,6 +100,22 @@ def maybe_download_and_extract(hypes, train_dir):
 
 def write_precision_to_summary(precision, summary_writer, name, global_step,
                                sess):
+    """
+    TODO.
+
+    Parameters
+    ----------
+    precision : TODO
+        TODO
+    summary_writer : TODO
+        TODO
+    name : TODO
+        TODO
+    global_step : TODO
+        TODO
+    sess : TODO
+        TODO
+    """
     # write result to summary
     summary = tf.Summary()
     # summary.ParseFromString(sess.run(summary_op))
@@ -96,11 +127,20 @@ def write_precision_to_summary(precision, summary_writer, name, global_step,
 def do_eval(hypes, eval_correct, phase, sess):
     """Runs one evaluation against the full epoch of data.
 
-    Args:
-      hypes: hypes
-      eval_correct: The Tensor that returns the number of correct predictions.
-      sess: The session in which the model has been trained.
-      name: string descriping the data the evaluation is run on
+    Parameters
+    ----------
+    hypes : dict
+        Hyperparameters
+    eval_correct : TODO
+        The Tensor that returns the number of correct predictions.
+    sess : TODO
+        The session in which the model has been trained.
+    name : str
+        Describes the data the evaluation is run on
+
+    Returns
+    -------
+    TODO
     """
     # And run one epoch of eval.
 
@@ -135,8 +175,8 @@ def run_training(hypes, train_dir):
     # Tell TensorFlow that the model will be built into the default Graph.
     target_dir = os.path.join(train_dir, "model_files")
     data_input = imp.load_source("input", hypes['model']['input_file'])
-    arch = imp.load_source("arch", hypes['model']['arch_file'])
-    solver = imp.load_source("solver", hypes['model']['solver_file'])
+    arch = imp.load_source("arch", hypes['model']['architecture_file'])
+    solver = imp.load_source("solver", hypes['model']['optimizer_file'])
 
     with tf.Graph().as_default():
 
@@ -259,16 +299,17 @@ def run_training(hypes, train_dir):
 
 
 def main(_):
-    if FLAGS.config == "example_params.py":
+    """TODO."""
+    if FLAGS.hypes == "example_params.py":
         logging.info("Training on default config.")
         logging.info(
             "Use train.py --config=your_config.py to train different models")
 
-    with open(tf.app.flags.FLAGS.config, 'r') as f:
+    with open(tf.app.flags.FLAGS.hypes, 'r') as f:
         logging.info("f: %s", f)
         hypes = json.load(f)
 
-    train_dir = utils.get_train_dir(tf.app.flags.FLAGS.config)
+    train_dir = utils.get_train_dir(tf.app.flags.FLAGS.hypes)
     hypes['train_dir'] = train_dir
 
     initialize_training_folder(hypes, train_dir)
