@@ -268,7 +268,9 @@ def main(_):
         logging.info("f: %s", f)
         hypes = json.load(f)
 
-    train_dir = utils.get_train_dir()
+    train_dir = utils.get_train_dir(tf.app.flags.FLAGS.config)
+    hypes['train_dir'] = train_dir
+
     initialize_training_folder(hypes, train_dir)
     maybe_download_and_extract(hypes, train_dir)
     run_training(hypes, train_dir)

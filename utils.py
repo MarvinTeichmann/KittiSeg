@@ -15,23 +15,26 @@ import config as cfg
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('name', None,
-                    'Folder where Data will be stored.')
+tf.app.flags.DEFINE_boolean('debug', False, 'Soggy Leaves')
+
 
 # usage: train.py --config=my_model_params.py
 flags.DEFINE_string('config', cfg.default_config,
                     'File storing model parameters.')
 
 
-def get_train_dir():
-    if FLAGS.name is None:
-        train_dir = os.path.join(cfg.model_dir, cfg.default_name)
+def get_train_dir(hypes_fname):
+    if FLAGS.debug:
+        train_dir = os.path.join(cfg.model_dir, 'debug')
         logging.info(
-            "Saving/Loading Model from default Folder: %s ", train_dir)
+            "Saving/Loading Model from debug Folder: %s ", train_dir)
         logging.info("Use --name=MYNAME to use Folder: %s ",
                      os.path.join(cfg.model_dir, "MYNAME"))
     else:
-        train_dir = os.path.join(cfg.model_dir, FLAGS.name)
+        json_name = hypes_fname.split('/')[-1].replace('.json', '')
+        date = datetime.now().strftime('%Y_%m_%d_%H.%M')
+        run_name = '%s_%s' % (json_name, date)
+        train_dir = os.path.join(cfg.model_dir, run_name)\
 
     return train_dir
 
