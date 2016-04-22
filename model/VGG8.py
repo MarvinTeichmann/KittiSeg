@@ -178,7 +178,7 @@ def inference(H, images, train=True):
     pool3 = _max_pool(name="pool3", bottom=conv3_2)
 
     # Reshape for fully convolutional Layer
-    reshape = _reshape(pool2)
+    reshape = _reshape(pool3)
 
     # First Fully Convolutional Layer
     fc4 = _fc_layer_with_dropout(name='fc4', bottom=reshape,
