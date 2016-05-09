@@ -64,7 +64,7 @@ def make_val_split(data_folder):
 
 def main():
     data_dir = utils.cfg.data_dir
-    zip_file = "Segmentation_Rigid_Training.zip"
+    zip_file = "data_road.zip"
     zip_file = os.path.join(data_dir, zip_file)
     if not os.path.exists(zip_file):
         logging.error("File not found: %s", zip_file)
