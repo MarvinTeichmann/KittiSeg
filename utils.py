@@ -15,7 +15,7 @@ import config as cfg
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-tf.app.flags.DEFINE_boolean('debug', False, 'Soggy Leaves')
+tf.app.flags.DEFINE_boolean('debug', True, 'Soggy Leaves')
 
 
 # usage: train.py --config=my_model_params.py

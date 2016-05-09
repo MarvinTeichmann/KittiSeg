@@ -1,21 +1,27 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """Trains, evaluates and saves the model network using a queue."""
 # pylint: disable=missing-docstring
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import json
-import os.path
-import time
-import logging
-import sys
 import imp
+import json
+import logging
+import os.path
+import sys
+import time
+
 from shutil import copyfile
 
 from six.moves import xrange  # pylint: disable=redefined-builtin
+
 import tensorflow as tf
 
 import utils as utils
+
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -71,12 +77,14 @@ def initialize_training_folder(hypes, train_dir):
 
     # TODO: read more about loggers and make file logging neater.
 
-    config_file = tf.app.flags.FLAGS.hypes
-    _copy_parameters_to_traindir(config_file, "hypes.json", target_dir)
+    hypes_file = tf.app.flags.FLAGS.hypes
+    _copy_parameters_to_traindir(hypes_file, "hypes.json", target_dir)
     _copy_parameters_to_traindir(
         hypes['model']['input_file'], "data_input.py", target_dir)
     _copy_parameters_to_traindir(
         hypes['model']['architecture_file'], "architecture.py", target_dir)
+    _copy_parameters_to_traindir(
+        hypes['model']['objective_file'], "objective.py", target_dir)
     _copy_parameters_to_traindir(
         hypes['model']['optimizer_file'], "solver.py", target_dir)
 
@@ -94,7 +102,6 @@ def maybe_download_and_extract(hypes, train_dir):
     """
     data_input = imp.load_source("input", hypes['model']['input_file'])
     if hasattr(data_input, 'maybe_download_and_extract'):
-        target_dir = os.path.join(train_dir, "model_files")
         data_input.maybe_download_and_extract(hypes, utils.cfg.data_dir)
 
 
@@ -155,13 +162,12 @@ def do_eval(hypes, eval_correct, phase, sess):
 
     # run evaluation on num_examples many images
     for step in xrange(steps_per_epoch):
-        start_time = time.time()
         true_count += sess.run(eval_correct[phase])
-        duration = time.time() - start_time
 
     precision = true_count / num_examples
 
-    logging.info('Data: %s  Num examples: %d  Num correct: %d  Precision @ 1: %0.04f' %
+    logging.info('Data: % s  Num examples: % d  Num correct: % d'
+                 'Precision @ 1: % 0.04f ' %
                  (phase, num_examples, true_count, precision))
 
     return precision
@@ -173,16 +179,16 @@ def run_training(hypes, train_dir):
     # test on MNIST.
 
     # Tell TensorFlow that the model will be built into the default Graph.
-    target_dir = os.path.join(train_dir, "model_files")
     data_input = imp.load_source("input", hypes['model']['input_file'])
     arch = imp.load_source("arch", hypes['model']['architecture_file'])
+    objective = imp.load_source("objective", hypes['model']['objective_file'])
     solver = imp.load_source("solver", hypes['model']['optimizer_file'])
 
     with tf.Graph().as_default():
 
         global_step = tf.Variable(0.0, trainable=False)
 
-        q, logits = {}, {}
+        q, logits, decoder, = {}, {}, {}
         image_batch, label_batch = {}, {}
         eval_correct = {}
 
@@ -195,18 +201,20 @@ def run_training(hypes, train_dir):
 
         logits['train'] = arch.inference(hypes, image_batch['train'], 'train')
 
+        decoder['train'] = objective.decoder(hypes, logits['train'])
+
         # Add to the Graph the Ops for loss calculation.
-        loss = arch.loss(hypes, logits['train'], label_batch['train'])
+        loss = objective.loss(hypes, decoder['train'], label_batch['train'])
 
         # Add to the Graph the Ops that calculate and apply gradients.
         train_op = solver.training(hypes, loss, global_step=global_step)
 
         # Add the Op to compare the logits to the labels during evaluation.
-        eval_correct['train'] = arch.evaluation(hypes, logits['train'],
-                                                label_batch['train'])
+        eval_correct['train'] = objective.evaluation(hypes, decoder['train'],
+                                                     label_batch['train'])
 
         # Validation Cycle to the Graph
-        with tf.name_scope('Validation') as scope:
+        with tf.name_scope('Validation'):
             q['val'] = data_input.create_queues(hypes, 'val')
             input_batch = data_input.inputs(hypes, q, 'val',
                                             utils.cfg.data_dir)
@@ -216,8 +224,10 @@ def run_training(hypes, train_dir):
 
             logits['val'] = arch.inference(hypes, image_batch['val'], 'val')
 
-            eval_correct['val'] = arch.evaluation(hypes, logits['val'],
-                                                  label_batch['val'])
+            decoder['val'] = objective.decoder(hypes, logits['val'])
+
+            eval_correct['val'] = objective.evaluation(hypes, decoder['val'],
+                                                       label_batch['val'])
 
         # Build the summary operation based on the TF collection of Summaries.
         summary_op = tf.merge_all_summaries()
@@ -257,11 +267,12 @@ def run_training(hypes, train_dir):
             # Write the summaries and print an overview fairly often.
             if step % 100 == 0:
                 # Print status to stdout.
-                duration = (time.time() - start_time)/100
+                duration = (time.time() - start_time) / 100
                 examples_per_sec = solver['batch_size'] / duration
                 sec_per_batch = float(duration)
                 logging.info(
-                 'Step %d: loss = %.2f ( %.3f sec (per Batch); %.1f examples/sec;)'%
+                    'Step % d: loss = % .2f '
+                    '( % .3f sec (per Batch); % .1f examples/sec;)' %
                     (step, loss_value, sec_per_batch, examples_per_sec))
                 # Update the events file.
                 summary_str = sess.run(summary_op)
@@ -269,13 +280,13 @@ def run_training(hypes, train_dir):
                 start_time = time.time()
 
             # Save a checkpoint and evaluate the model periodically.
-            if (step+1) % 1000 == 0 or (step + 1) == solver['max_steps']:
+            if (step + 1) % 1000 == 0 or (step + 1) == solver['max_steps']:
                 checkpoint_path = os.path.join(train_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
                 start_time = time.time()
                 # Evaluate against the training set.
 
-            if (step+1) % 1000 == 0 or (step + 1) == solver['max_steps']:
+            if (step + 1) % 1000 == 0 or (step + 1) == solver['max_steps']:
 
                 logging.info('Doing Evaluate with Training Data.')
 
@@ -283,7 +294,6 @@ def run_training(hypes, train_dir):
                                     sess=sess)
                 write_precision_to_summary(precision, summary_writer,
                                            "Train", step, sess)
-                
 
                 logging.info('Doing Evaluation with Testing Data.')
                 precision = do_eval(hypes, eval_correct, phase='val',
@@ -299,11 +309,6 @@ def run_training(hypes, train_dir):
 
 
 def main(_):
-    """TODO."""
-    if FLAGS.hypes == "example_params.py":
-        logging.info("Training on default config.")
-        logging.info(
-            "Use train.py --config=your_config.py to train different models")
 
     with open(tf.app.flags.FLAGS.hypes, 'r') as f:
         logging.info("f: %s", f)

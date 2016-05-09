@@ -10,7 +10,7 @@ from __future__ import division
 from __future__ import print_function
 
 import itertools
-# import ipdb
+import ipdb
 import json
 import logging
 import os
@@ -50,7 +50,8 @@ def _load_gt_file(hypes, data_file=None):
             assert os.path.exists(gt_image_file), \
                 "File does not exist: %s" % gt_image_file
             image = scipy.misc.imread(image_file)
-            gt_image = scp.misc.imread(gt_image_file)
+            # Please update Scipy, if mode='RGB' is not avaible
+            gt_image = scp.misc.imread(gt_image_file, mode='RGB')
 
             yield image, gt_image
 
@@ -79,6 +80,8 @@ def _make_data_gen(hypes, phase, data_dir):
     Road = 0
     for image, gt_image in data:
         shape = image.shape
+        gt_shape = gt_image.shape
+
         assert shape[0] - image_size > 0, \
             "Invalid image_size"
         assert shape[1] - image_size > 0, \

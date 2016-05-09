@@ -2,11 +2,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf
-import re
-
-import sys
 import logging
+
+import tensorflow as tf
 
 
 def _activation_summary(x):
@@ -37,7 +35,8 @@ def _weight_variable(shape, stddev=0.01):
       stddev: standard deviation of a truncated Gaussian
     """
     initializer = tf.truncated_normal_initializer(stddev=stddev)
-    return tf.get_variable(name='weights', shape=shape, initializer=initializer)
+    return tf.get_variable(name='weights', shape=shape,
+                           initializer=initializer)
 
 
 def _bias_variable(shape, constant=0.0):
@@ -66,7 +65,7 @@ def _variable_with_weight_decay(shape, stddev, wd):
     var = tf.get_variable('weights', shape=shape,
                           initializer=initializer)
 
-    if wd and (tf.get_variable_scope().reuse == False):
+    if wd and (not tf.get_variable_scope().reuse):
         weight_decay = tf.mul(tf.nn.l2_loss(var), wd, name='weight_loss')
         tf.add_to_collection('losses', weight_decay)
     return var
@@ -78,15 +77,15 @@ def _conv_layer(name, bottom, num_filter,
         n = bottom.get_shape()[3].value
         logging.debug("Layer: %s, Fan-in: %d" % (name, n))
         shape = [ksize[0], ksize[1], n, num_filter]
-        num_input = ksize[0]*ksize[1]*n
-        stddev = (2/num_input)**0.5
+        num_input = ksize[0] * ksize[1] * n
+        stddev = (2 / num_input)**0.5
         logging.debug("Layer: %s, stddev: %f" % (name, stddev))
-        # stddev = 1e-4
         weights = _weight_variable(shape, stddev)
         bias = _bias_variable([num_filter], constant=0.0)
         conv = tf.nn.conv2d(bottom, weights,
                             strides=strides, padding=padding)
-        relu = tf.nn.relu(conv + bias, name=scope.name)
+        bias_layer = tf.nn.bias_add(conv, bias, name=scope.name)
+        relu = tf.nn.relu(bias_layer, name=scope.name)
         _activation_summary(relu)
     return relu
 
@@ -102,7 +101,7 @@ def _max_pool(name, bottom, ksize=[1, 2, 2, 1],
 
 def _reshape(bottom, name="reshape"):
     logging.debug("Size of Reshape %s " % bottom.get_shape())
-    with tf.variable_scope(name) as scope:
+    with tf.variable_scope(name):
         shape = bottom.get_shape().as_list()
         dim = 1
         for d in shape[1:]:
@@ -115,8 +114,8 @@ def _fc_layer_with_dropout(bottom, name, size,
 
     with tf.variable_scope(name) as scope:
         n1 = bottom.get_shape()[1].value
-        stddev = (2/n1)**0.5
-        #stddev = 0.04
+        stddev = (2 / n1)**0.5
+
         logging.debug("Layer: %s, Size: %d", name, n1)
         logging.debug("Layer: %s, stddev: %f", name, stddev)
         weights = _variable_with_weight_decay(shape=[n1, size],
@@ -133,11 +132,11 @@ def _fc_layer_with_dropout(bottom, name, size,
         return fullc
 
 
-def _softmax(bottom, num_classes):
+def _logits(bottom, num_classes):
     # Computing Softmax
     with tf.variable_scope('logits') as scope:
         n1 = bottom.get_shape()[1].value
-        stddev = (1/n1)**0.5
+        stddev = (1 / n1)**0.5
         weights = _variable_with_weight_decay(shape=[n1, num_classes],
                                               stddev=stddev, wd=0.0)
 
@@ -148,7 +147,7 @@ def _softmax(bottom, num_classes):
     return logits
 
 
-def inference(H, images, train=True):
+def inference(hypes, images, train=True):
     """Build the MNIST model up to where it may be used for inference.
 
     Args:
@@ -188,60 +187,6 @@ def inference(H, images, train=True):
     fc5 = _fc_layer_with_dropout(name='fc5', bottom=fc4,
                                  train=train, size=192)
     # Adding Softmax
-    logits = _softmax(fc5, H['arch']['num_classes'])
+    logits = _logits(fc5, hypes['arch']['num_classes'])
 
     return logits
-
-
-def loss(H, logits, labels):
-    """Calculates the loss from the logits and the labels.
-
-    Args:
-      logits: Logits tensor, float - [batch_size, NUM_CLASSES].
-      labels: Labels tensor, int32 - [batch_size].
-
-    Returns:
-      loss: Loss tensor of type float.
-    """
-    # Convert from sparse integer labels in the range [0, NUM_CLASSSES)
-    # to 1-hot dense float vectors (that is we will have batch_size vectors,
-    # each with NUM_CLASSES values, all of which are 0.0 except there will
-    # be a 1.0 in the entry corresponding to the label).
-    with tf.name_scope('loss'):
-        batch_size = tf.size(labels)
-        labels = tf.expand_dims(labels, 1)
-        indices = tf.expand_dims(tf.range(0, batch_size), 1)
-        concated = tf.concat(1, [indices, labels])
-        onehot_labels = tf.sparse_to_dense(
-            concated, tf.pack([batch_size, H['arch']['num_classes']]), 1.0, 0.0)
-        cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits,
-                                                                onehot_labels,
-                                                                name='xentropy')
-        cross_entropy_mean = tf.reduce_mean(
-            cross_entropy, name='xentropy_mean')
-        tf.add_to_collection('losses', cross_entropy_mean)
-
-        loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
-    return loss
-
-
-def evaluation(H, logits, labels):
-    """Evaluate the quality of the logits at predicting the label.
-
-    Args:
-      logits: Logits tensor, float - [batch_size, NUM_CLASSES].
-      labels: Labels tensor, int32 - [batch_size], with values in the
-        range [0, NUM_CLASSES).
-
-    Returns:
-      A scalar int32 tensor with the number of examples (out of batch_size)
-      that were predicted correctly.
-    """
-    # For a classifier model, we can use the in_top_k Op.
-    # It returns a bool tensor with shape [batch_size] that is true for
-    # the examples where the label's is was in the top k (here k=1)
-    # of all logits for that example.
-    with tf.name_scope('eval'):
-        correct = tf.nn.in_top_k(logits, labels, 1)
-        # Return the number of true entries.
-        return tf.reduce_sum(tf.cast(correct, tf.int32))
