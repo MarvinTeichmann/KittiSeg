@@ -92,7 +92,7 @@ def _make_data_gen(hypes, phase, data_dir):
 
         yield np.fliplr(image), np.fliplr(gt_image)
 
-        yield np.flipud(image), npy.flipud(gt_image)
+        yield np.flipud(image), np.flipud(gt_image)
 
         yield np.flipud(np.fliplr(image)), np.flipud(np.fliplr(gt_image))
 
