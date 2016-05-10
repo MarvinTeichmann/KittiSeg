@@ -1,9 +1,9 @@
 {
   "model": {
-    "input_file": "model/kitti_seg_input.py",
-    "architecture_file" : "model/deconv_model.py",
-    "objective_file" : "model/objectives/seg_softmax_cross.py",
-    "optimizer_file" : "model/adam_optimizer.py"
+    "input_file": "model/segmentation/kitti_seg_input.py",
+    "architecture_file" : "model/segmentation/deconv_model.py",
+    "objective_file" : "model/segmentation/softmax_sum.py",
+    "optimizer_file" : "model/segmentation/adam_optimizer.py"
   },
 
   "data": {

@@ -10,13 +10,14 @@ from __future__ import division
 from __future__ import print_function
 
 import itertools
-import ipdb
 import json
 import logging
 import os
 import sys
-import random
+# import random
 from random import shuffle
+
+import ipdb
 
 import numpy as np
 
@@ -50,12 +51,15 @@ def _load_gt_file(hypes, data_file=None):
             assert os.path.exists(gt_image_file), \
                 "File does not exist: %s" % gt_image_file
             image = scipy.misc.imread(image_file)
-            gt_image = scp.misc.imread(gt_image_file)
+            # Please update Scipy, if mode='RGB' is not avaible
+            gt_image = scp.misc.imread(gt_image_file, mode='RGB')
 
             yield image, gt_image
 
 
 def _make_data_gen(hypes, phase, data_dir):
+    """Returns a data generator that outputs image samples."""
+
     """Returns a data generator that outputs image samples."""
 
     if phase == 'train':
@@ -67,64 +71,61 @@ def _make_data_gen(hypes, phase, data_dir):
 
     data_file = os.path.join(data_dir, data_file)
 
-    image_size = hypes['arch']['image_size']
-    num_pixels = image_size * image_size
+    road_color = np.array(hypes['data']['road_color'])
     background_color = np.array(hypes['data']['background_color'])
 
     data = _load_gt_file(hypes, data_file)
 
     for image, gt_image in data:
-        shape = image.shape
-        assert shape[0] - image_size > 0, \
-            "Invalid image_size"
-        assert shape[1] - image_size > 0, \
-            "Invalid image_size"
-        
-        # Select Background Image
-        for i in range(100):
-            x = np.random.randint(shape[0] - image_size)
-            y = np.random.randint(shape[1] - image_size)
 
-            gt_patch = gt_image[x:(x + image_size), y:(y + image_size)]
-            mygt = (gt_patch != background_color)
-            if np.sum(mygt) == 0:
-                if random.random() > 0.66:
-                    image_patch = image[x:(x + image_size), y:(y + image_size)]
-                    yield image_patch, 0
-            elif np.sum(mygt) > 0.1 * num_pixels:
-                image_patch = image[x:(x + image_size), y:(y + image_size)]
-                yield image_patch, 1
-                
+        gt_bg = np.all(gt_image == background_color, axis=2)
+        gt_road = np.all(gt_image == road_color, axis=2)
+
+        assert(gt_road.shape == gt_bg.shape)
+        shape = gt_bg.shape
+        gt_bg = gt_bg.reshape(shape[0], shape[1], 1)
+        gt_road = gt_road.reshape(shape[0], shape[1], 1)
+
+        gt_image = np.concatenate((gt_bg, gt_road), axis=2)
+
+        yield image, gt_image
+
+        yield np.fliplr(image), np.fliplr(gt_image)
+
+        yield np.flipud(image), npy.flipud(gt_image)
+
+        yield np.flipud(np.fliplr(image)), np.flipud(np.fliplr(gt_image))
 
 
-def placeholders(hypes):
-    """ Placeholders are not used in cifar10"""
-
-    return None
 
 
 def create_queues(hypes, phase):
     arch = hypes['arch']
     dtypes = [tf.float32, tf.int32]
     shapes = (
-        [arch['image_size'], arch['image_size'], arch['num_channels']],
-        [],)
+        [arch['image_height'], arch['image_width'], arch['num_channels']],
+        [arch['image_height'], arch['image_width'], arch['num_classes']],)
     capacity = 100
     q = tf.FIFOQueue(capacity=100, dtypes=dtypes, shapes=shapes)
-    tf.scalar_summary("queue/%s/fraction_of_%d_full" % (q.name + phase, capacity),
+    tf.scalar_summary("queue/%s/fraction_of_%d_full" %
+                      (q.name + phase, capacity),
                       math_ops.cast(q.size(), tf.float32) * (1. / capacity))
 
     return q
 
 
 def start_enqueuing_threads(hypes, q, sess, data_dir):
-    image_size = hypes['arch']['image_size']
-    num_channels = hypes['arch']['num_channels']
+
+    shape = [hypes['arch']['image_height'], hypes['arch']['image_width'],
+             hypes['arch']['num_channels']]
     image_pl = tf.placeholder(tf.float32,
-                              shape=[image_size, image_size, num_channels])
+                              shape=shape)
 
     # Labels
-    label_pl = tf.placeholder(tf.int32, shape=[])
+    shape = [hypes['arch']['image_height'], hypes['arch']['image_width'],
+             hypes['arch']['num_classes']]
+    label_pl = tf.placeholder(tf.int32,
+                              shape=shape)
 
     def make_feed(data):
         image, label = data
@@ -150,11 +151,10 @@ def start_enqueuing_threads(hypes, q, sess, data_dir):
                                                            phase, gen)))
         threads[-1].start()
 
+
 def _read_processed_image(q, phase):
     image, label = q[phase].dequeue()
     if phase == 'train':
-        # Randomly flip the image horizontally.
-        image = tf.image.random_flip_left_right(image)
 
         # Because these operations are not commutative, consider randomizing
         # randomize the order their operation.
@@ -168,44 +168,59 @@ def _read_processed_image(q, phase):
 
 def inputs(hypes, q, phase, data_dir):
     num_threads = 4
-    example_list = [_read_processed_image(q, phase) for i in range(num_threads)]
-
+    example_list = [_read_processed_image(q, phase)
+                    for i in range(num_threads)]
 
     batch_size = hypes['solver']['batch_size']
-    minad = 10000
+    minad = 32
     capacity = minad + 3 * batch_size
-    image_batch, label_batch = tf.train.shuffle_batch_join(example_list,
-                                                           batch_size=batch_size,
-                                                           min_after_dequeue=minad,
-                                                           capacity=capacity)
+    image_batch, label_batch = tf.train.shuffle_batch_join(
+        example_list,
+        batch_size=batch_size,
+        min_after_dequeue=minad,
+        capacity=capacity)
+
+    # Display the training images in the visualizer.
+    tensor_name = image_batch.op.name
+    tf.image_summary(tensor_name + 'images', image_batch)
+
     return image_batch, label_batch
 
 
 def main():
 
-    with open('../hypes/medseg.json', 'r') as f:
+    with open('../hypes/kitti_seg.json', 'r') as f:
         hypes = json.load(f)
 
     q = {}
     q['train'] = create_queues(hypes, 'train')
     q['val'] = create_queues(hypes, 'val')
     data_dir = "../DATA"
+
+    _make_data_gen(hypes, 'train', data_dir)
+
     image_batch, label_batch = inputs(hypes, q, 'train', data_dir)
+
+    logging.info("Start running")
 
     with tf.Session() as sess:
         # Run the Op to initialize the variables.
         init = tf.initialize_all_variables()
         sess.run(init)
         coord = tf.train.Coordinator()
-        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
-
-
         start_enqueuing_threads(hypes, q, sess, data_dir)
+
+        logging.info("Start running")
+        threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
         for i in itertools.count():
             image = image_batch.eval()
-            logging.info("Class is: %s", label_batch.eval())
-            # scp.misc.imshow(image[0])
+            gt = label_batch.eval()
+            scp.misc.imshow(image[0])
+            gt_bg = gt[0, :, :, 0]
+            gt_road = gt[0, :, :, 1]
+            scp.misc.imshow(gt_bg)
+            scp.misc.imshow(gt_road)
 
         coord.request_stop()
         coord.join(threads)

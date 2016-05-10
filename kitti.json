@@ -1,8 +1,9 @@
 {
   "model": {
-    "input_file": "model/kitti_input.py",
-    "architecture_file" : "model/VGG8.py",
-    "optimizer_file" : "model/adam_optimizer.py"
+    "input_file": "model/classification/kitti_input.py",
+    "architecture_file" : "model/classification/VGG8.py",
+    "objective_file" : "model/classification/softmax_classifier.py",
+    "optimizer_file" : "model/classification/adam_optimizer.py"
   },
 
   "data": {
