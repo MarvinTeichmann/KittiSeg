@@ -355,7 +355,6 @@ def main(_):
     initialize_training_folder(hypes)
     maybe_download_and_extract(hypes)
     logging.info("Start Training")
-    time.sleep(5)
     run_training(hypes)
 
 
