@@ -74,7 +74,7 @@ def _variable_with_weight_decay(shape, stddev, wd):
 
 
 def _conv_layer(name, bottom, num_filter,
-                ksize=[3, 3], strides=[1, 1, 1, 1], padding='SAME'):
+                ksize=[3, 3], strides=[1, 1, 1, 1], wd=5e-3, padding='SAME'):
     with tf.variable_scope(name) as scope:
         n = bottom.get_shape()[3].value
         logging.debug("Layer: %s, Fan-in: %d" % (name, n))
@@ -82,7 +82,7 @@ def _conv_layer(name, bottom, num_filter,
         num_input = ksize[0] * ksize[1] * n
         stddev = (2 / num_input)**0.5
         logging.debug("Layer: %s, stddev: %f" % (name, stddev))
-        weights = _weight_variable(shape, stddev)
+        weights = _variable_with_weight_decay(shape, stddev, wd)
         bias = _bias_variable([num_filter], constant=0.0)
         conv = tf.nn.conv2d(bottom, weights,
                             strides=strides, padding=padding)
@@ -91,19 +91,22 @@ def _conv_layer(name, bottom, num_filter,
     return relu
 
 
-def _upsample_layer(name, bottom1, bottom2,
-                    ksize=[3, 3], strides=[1, 2, 2, 1], padding='SAME'):
+def _upsample_layer(name, bottom1, bottom2, num_filter,
+                    ksize=[3, 3], strides=[1, 2, 2, 1],
+                    wd=5e-3, padding='SAME'):
     with tf.variable_scope(name) as scope:
         in_features = bottom1.get_shape()[3].value
-        out_features = bottom2.get_shape()[3].value
-        output_shape = tf.shape(bottom2)
+        shape = tf.shape(bottom2)
+        new_shape = [shape[0], shape[1], shape[2], num_filter]
+        output_shape = tf.pack(new_shape)
+
         logging.debug("Layer: %s, Fan-in: %d" % (name, in_features))
-        shape = [ksize[0], ksize[1], out_features, in_features]
+        shape = [ksize[0], ksize[1], num_filter, in_features]
         num_input = ksize[0] * ksize[1] * in_features / strides[1]
         stddev = (2 / num_input)**0.5
         logging.debug("Layer: %s, stddev: %f" % (name, stddev))
-        weights = _weight_variable(shape, stddev)
-        bias = _bias_variable([out_features], constant=0.0)
+        weights = _variable_with_weight_decay(shape, stddev, wd)
+        bias = _bias_variable([num_filter], constant=0.0)
         deconv = tf.nn.conv2d_transpose(bottom1, weights, output_shape,
                                         strides=strides, padding=padding)
         relu = tf.nn.relu(deconv + bias, name=scope.name)
@@ -156,7 +159,7 @@ def _fc_layer_with_dropout(bottom, name, size,
         return fullc
 
 
-def _logits(bottom, num_classes):
+def _logits(bottom, num_classes, wd=5e-3):
     # Computing Softmax
     name = "logits"
     ksize = [1, 1]
@@ -167,7 +170,7 @@ def _logits(bottom, num_classes):
         num_input = ksize[0] * ksize[1] * n
         stddev = (2 / num_input)**0.5
         logging.debug("Layer: %s, stddev: %f" % (name, stddev))
-        weights = _weight_variable(shape, stddev)
+        weights = _variable_with_weight_decay(shape, stddev, wd)
         bias = _bias_variable([num_classes], constant=0.0)
         conv = tf.nn.conv2d(bottom, weights, strides=[1, 1, 1, 1],
                             padding='SAME')
@@ -185,6 +188,8 @@ def inference(hypes, images, train=True):
     Returns:
       softmax_linear: Output tensor with the computed logits.
     """
+
+    keep_prob = 0.5
 
     # First Block of Convolutional Layers
     # with tf.name_scope('Pool1') as scope:
@@ -206,22 +211,39 @@ def inference(hypes, images, train=True):
 
     # Reshape for fully convolutional Layer
     conv4_1 = _conv_layer(name="conv4_1", bottom=pool3, num_filter=256)
-    conv4_2 = _conv_layer(name="conv4_2", bottom=conv4_1, num_filter=256,
-                          ksize=[7, 7])
+    conv4_2 = _conv_layer(name="conv4_2", bottom=conv4_1, num_filter=256)
+    conv4_3 = _conv_layer(name="conv4_3", bottom=conv4_2, num_filter=256)
+
+    if train:
+        conv4_3 = tf.nn.dropout(conv4_3, keep_prob, name='dropout_conv4_3')
+
+    conv4_4 = _conv_layer(name="conv4_4", bottom=conv4_3, num_filter=256)
+    conv4_5 = _conv_layer(name="conv4_5", bottom=conv4_4, num_filter=256)
+    conv4_6 = _conv_layer(name="conv4_6", bottom=conv4_5, num_filter=256)
+
+    if train:
+        conv4_6 = tf.nn.dropout(conv4_6, keep_prob, name='dropout_conv4_6')
 
     # Upsample layer 3
-    up3 = _upsample_layer(name="up4", bottom1=conv4_2, bottom2=conv3_2)
-    conv3_up = _conv_layer(name="conv3_up", bottom=up3, num_filter=128)
+    up3 = _upsample_layer(name="up4", bottom1=conv4_6, bottom2=conv3_2,
+                          num_filter=128)
+    conv3_up = _conv_layer(name="conv3_up", bottom=up3, num_filter=128,
+                           ksize=[1, 1])
 
     # Upsample layer 2
-    up2 = _upsample_layer(name="up2", bottom1=conv3_up, bottom2=conv2_2)
-    conv2_up = _conv_layer(name="conv2_up", bottom=up2, num_filter=64)
+    up2 = _upsample_layer(name="up2", bottom1=conv3_up, bottom2=conv2_2,
+                          num_filter=96)
+    conv2_up = _conv_layer(name="conv2_up", bottom=up2, num_filter=96,
+                           ksize=[1, 1])
 
-    # Upsample layer 2
-    up1 = _upsample_layer(name="up1", bottom1=conv2_up, bottom2=conv1_2)
-    conv1_up = _conv_layer(name="conv1_up", bottom=up1, num_filter=64)
-    # conv1_up2 = _conv_layer(name="conv1_up_2", bottom=conv1_up, num_filter=8)
-    # conv1_up3 = _conv_layer(name="conv1_up_3",bottom=conv1_up2, num_filter=4)
+    # Upsample layer 1
+    up1 = _upsample_layer(name="up1", bottom1=conv2_up, bottom2=conv1_2,
+                          num_filter=96)
+    conv1_up = _conv_layer(name="conv1_up", bottom=up1, num_filter=96,
+                           ksize=[1, 1])
+
+    if train:
+        conv1_up = tf.nn.dropout(conv1_up, keep_prob, name='dropout_up')
 
     # Adding Softmax
     logits = _logits(bottom=conv1_up, num_classes=2)

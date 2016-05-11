@@ -36,7 +36,7 @@ def loss(hypes, logits, labels):
     # be a 1.0 in the entry corresponding to the label).
     with tf.name_scope('loss'):
         logits = tf.reshape(logits, (-1, 2))
-        labels = tf.reshape(logits, (-1, 2))
+        labels = tf.to_float(tf.reshape(labels, (-1, 2)))
 
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
             logits, labels, name='xentropy')
@@ -71,4 +71,4 @@ def evaluation(hypes, logits, labels):
         dense_labels = labels[:, 1]
         correct = tf.nn.in_top_k(logits, dense_labels, 1)
         # Return the number of true entries.
-        return tf.reduce_sum(tf.cast(correct, tf.int32))
+        return tf.reduce_mean(tf.cast(correct, tf.float32)) 
