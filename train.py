@@ -162,18 +162,18 @@ def do_eval(hypes, eval_correct, phase, sess):
     if phase == 'val':
         num_examples = hypes['data']['num_examples_per_epoch_for_eval']
 
-    true_count = 0  # Counts the number of correct predictions.
+    true_count = 0.0  # Counts the number of correct predictions.
     steps_per_epoch = num_examples // hypes['solver']['batch_size']
     num_examples = steps_per_epoch * hypes['solver']['batch_size']
 
     # run evaluation on num_examples many images
     for step in xrange(steps_per_epoch):
         true_count += sess.run(eval_correct[phase])
-
+        
     precision = true_count / num_examples
 
-    logging.info('Data: % s  Num examples: % d  Num correct: % d'
-                 'Precision @ 1: % 0.04f ' %
+    logging.info('Data: % s  Num examples: % d  Num correct: % 0.04f'
+                 ' Precision @ 1: % 0.04f ' %
                  (phase, num_examples, true_count, precision))
 
     return precision
@@ -294,14 +294,14 @@ def run_training(hypes):
                 start_time = time.time()
 
             # Save a checkpoint and evaluate the model periodically.
-            if (step + 1) % 1000 == 0 or (step + 1) == solver['max_steps']:
+            if (step +1) % int(utils.cfg.step_eval) == 0 or (step + 1) == solver['max_steps']:
                 checkpoint_path = os.path.join(hypes['dirs']['output_dir'],
                                                'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
                 start_time = time.time()
                 # Evaluate against the training set.
 
-            if (step + 1) % 1000 == 0 or (step + 1) == solver['max_steps']:
+            if (step + 1) % int(utils.cfg.step_eval) == 0 or (step + 1) == solver['max_steps']:
 
                 logging.info('Doing Evaluate with Training Data.')
 

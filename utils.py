@@ -106,6 +106,7 @@ _set_cfg_value('plugin_dir',
                os.path.expanduser("~/tv-plugins"),
                cfg)
 _set_cfg_value('step_show', 'TV_STEP_SHOW', 100, cfg)
+_set_cfg_value('step_eval', 'TV_STEP_EVAL', 100, cfg)
 _set_cfg_value('step_str',
                'TV_STEP_STR',
                ('Step {step}/{total_steps}: loss = {loss_value:.2f} '
