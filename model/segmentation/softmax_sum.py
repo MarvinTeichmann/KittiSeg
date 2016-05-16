@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""Trains, evaluates and saves the model network using a queue."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -8,7 +12,7 @@ import tensorflow as tf
 
 
 def decoder(hypes, logits):
-    """ Applies decoder to the logits
+    """Apply decoder to the logits.
 
     Args:
       logits: Logits tensor, float - [batch_size, NUM_CLASSES].
@@ -16,12 +20,11 @@ def decoder(hypes, logits):
     Return:
       logits: the logits are already decoded.
     """
-
     return logits
 
 
 def loss(hypes, logits, labels):
-    """Calculates the loss from the logits and the labels.
+    """Calculate the loss from the logits and the labels.
 
     Args:
       logits: Logits tensor, float - [batch_size, NUM_CLASSES].
@@ -36,13 +39,26 @@ def loss(hypes, logits, labels):
     # be a 1.0 in the entry corresponding to the label).
     with tf.name_scope('loss'):
         logits = tf.reshape(logits, (-1, 2))
+        shape = [logits.get_shape()[0], 2]
+        epsilon = tf.constant(value=hypes['solver']['epsilon'], shape=shape)
+        logits = logits + epsilon
         labels = tf.to_float(tf.reshape(labels, (-1, 2)))
 
-        cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
-            logits, labels, name='xentropy')
+        softmax = tf.nn.softmax(logits)
+        # softmax = tf.Print(softmax, [tf.reduce_min(softmax)],
+        #                     message='Checking for negative: ')
+        head = hypes['arch']['weight']
+        cross_entropy = -tf.reduce_sum(tf.mul(labels * tf.log(softmax), head),
+                                       reduction_indices=[1])
 
-        cross_entropy_mean = tf.reduce_mean(
-            cross_entropy, name='xentropy_mean')
+        # TODO Check!
+
+        # cross_entropy = tf.Print(cross_entropy, [tf.reduce_max(cross_entropy)
+        # ],
+        #                          message='Checking max of entropy: ')
+
+        cross_entropy_mean = tf.reduce_mean(cross_entropy,
+                                            name='xentropy_mean')
         tf.add_to_collection('losses', cross_entropy_mean)
 
         loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
@@ -68,7 +84,36 @@ def evaluation(hypes, logits, labels):
     with tf.name_scope('eval'):
         logits = tf.reshape(logits, (-1, 2))
         labels = tf.reshape(labels, (-1, 2))
-        dense_labels = labels[:, 1]
-        correct = tf.nn.in_top_k(logits, dense_labels, 1)
-        # Return the number of true entries.
-        return tf.reduce_mean(tf.cast(correct, tf.float32)) 
+
+        pred = tf.argmax(logits, dimension=1)
+
+        negativ = tf.to_int32(tf.equal(pred, 0))
+        tn = tf.reduce_sum(negativ*labels[:, 0])
+        fn = tf.reduce_sum(negativ*labels[:, 1])
+
+        positive = tf.to_int32(tf.equal(pred, 1))
+        tp = tf.reduce_sum(positive*labels[:, 1])
+        fp = tf.reduce_sum(positive*labels[:, 0])
+
+        eval_list = []
+
+        eval_list.append(('Accuracy', (tn+tp)/(tn + fn + tp + fp)))
+        eval_list.append(('Precision', tp/(tp + fp)))
+        eval_list.append(('True BG', tn/(tn + fp)))
+        eval_list.append(('True Street [Recall]', tp/(tp + fn)))
+
+        return eval_list
+
+
+def create_image_summary(hypes, image, logits, labels):
+    """Create an output im.
+
+    Args:
+      logits: Logits tensor, float - [batch_size, NUM_CLASSES].
+      labels: Labels tensor, int32 - [batch_size], with values in the
+        range [0, NUM_CLASSES).
+
+    Returns:
+    """
+
+    

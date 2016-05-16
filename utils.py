@@ -26,6 +26,10 @@ else:
                         'output will be saved to the folder TV_DIR_RUNS/debug '
                         'hence it will get overwritten by further runs.'))
 
+
+flags.DEFINE_string('name', None,
+                    'Append a name Tag to run.')
+
 # usage: train.py --config=my_model_params.py
 flags.DEFINE_string('hypes', None,
                     'File storing model parameters.')
@@ -54,12 +58,14 @@ def set_dirs(hypes, hypes_fname):
         else:
             runs_dir = os.path.join(base_path, 'RUNS')
 
-        if not FLAGS.save:
+        if not FLAGS.save and FLAGS.name is None:
             output_dir = os.path.join(runs_dir, 'debug')
         else:
             json_name = hypes_fname.split('/')[-1].replace('.json', '')
             date = datetime.now().strftime('%Y_%m_%d_%H.%M')
             run_name = '%s_%s' % (json_name, date)
+            if FLAGS.name is not None:
+                run_name = run_name + "_" + FLAGS.name
             output_dir = os.path.join(runs_dir, run_name)
 
         hypes['dirs']['output_dir'] = output_dir

@@ -11,6 +11,7 @@ import imp
 import pdb
 import json
 import logging
+import numpy as np
 import os.path
 import sys
 
@@ -137,14 +138,14 @@ def write_precision_to_summary(precision, summary_writer, name, global_step,
     summary_writer.add_summary(summary, global_step)
 
 
-def do_eval(hypes, eval_correct, phase, sess):
+def do_eval(hypes, eval_list, phase, sess):
     """Run one evaluation against the full epoch of data.
 
     Parameters
     ----------
     hypes : dict
         Hyperparameters
-    eval_correct : TODO
+    eval_dict : TODO
         The Tensor that returns the number of correct predictions.
     sess : TODO
         The session in which the model has been trained.
@@ -156,27 +157,53 @@ def do_eval(hypes, eval_correct, phase, sess):
     TODO
     """
     # And run one epoch of eval.
+    # Checking for List for compability
+    if type(eval_list[phase]) is list:
+        eval_names, eval_op = zip(*eval_list[phase])
+
+    else:
+        logging.warning("Passing eval_op directly is deprecated.."
+                        "Pass a list of tubles instead.")
+        eval_names = ['Accuracy']
+        eval_op = [eval_list[phase]]
+
+    assert(len(eval_names) == len(eval_op))
 
     if phase == 'train':
         num_examples = hypes['data']['num_examples_per_epoch_for_train']
     if phase == 'val':
         num_examples = hypes['data']['num_examples_per_epoch_for_eval']
 
-    true_count = 0.0  # Counts the number of correct predictions.
     steps_per_epoch = num_examples // hypes['solver']['batch_size']
     num_examples = steps_per_epoch * hypes['solver']['batch_size']
 
+    logging.info('Data: % s  Num examples: % d ' % (phase, num_examples))
     # run evaluation on num_examples many images
-    for step in xrange(steps_per_epoch):
-        true_count += sess.run(eval_correct[phase])
-        
-    precision = true_count / num_examples
+    results = sess.run(eval_op)
+    logging.debug('Output of eval: %s', results)
+    for step in xrange(1, steps_per_epoch):
+        results = map(np.add, results, sess.run(eval_op))
 
-    logging.info('Data: % s  Num examples: % d  Num correct: % 0.04f'
-                 ' Precision @ 1: % 0.04f ' %
-                 (phase, num_examples, true_count, precision))
+    avg_results = [result / steps_per_epoch for result in results]
 
-    return precision
+    for name, value in zip(eval_names, avg_results):
+        logging.info('%s : % 0.04f ' % (name, value))
+
+    return avg_results[0]  # TODO
+
+
+def _prepare_evaluation_summary(hypes):
+    """Create Ops and Placeholder required to write to image Board."""
+    image_to_log = tf.placeholder(tf.uint8)
+    image_name = tf.placeholder(tf.string)
+    write_image = tf.image_summary(image_name, tf.expand_dims(image_to_log, 0))
+
+    return image_to_log, image_name, write_image
+
+
+def _write_images_tensorboard():
+
+execute_image_summary()
 
 
 def run_training(hypes):
@@ -201,7 +228,7 @@ def run_training(hypes):
 
         q, logits, decoder, = {}, {}, {}
         image_batch, label_batch = {}, {}
-        eval_correct = {}
+        eval_dict = {}
 
         # Add Input Producers to the Graph
         with tf.name_scope('Input'):
@@ -221,8 +248,8 @@ def run_training(hypes):
         train_op = solver.training(hypes, loss, global_step=global_step)
 
         # Add the Op to compare the logits to the labels during evaluation.
-        eval_correct['train'] = objective.evaluation(hypes, decoder['train'],
-                                                     label_batch['train'])
+        eval_dict['train'] = objective.evaluation(hypes, decoder['train'],
+                                                  label_batch['train'])
 
         # Validation Cycle to the Graph
         with tf.name_scope('Validation'):
@@ -237,14 +264,17 @@ def run_training(hypes):
 
             decoder['val'] = objective.decoder(hypes, logits['val'])
 
-            eval_correct['val'] = objective.evaluation(hypes, decoder['val'],
-                                                       label_batch['val'])
+            eval_dict['val'] = objective.evaluation(hypes, decoder['val'],
+                                                    label_batch['val'])
 
         # Build the summary operation based on the TF collection of Summaries.
         summary_op = tf.merge_all_summaries()
 
         # Create a saver for writing training checkpoints.
         saver = tf.train.Saver()
+
+        # create tensors for summary
+        image_summary = _prepare_evaluation_summary(hypes)
 
         # Create a session for running Ops on the Graph.
         sess = tf.Session()
@@ -263,7 +293,7 @@ def run_training(hypes):
 
         # Instantiate a SummaryWriter to output summaries and the Graph.
         summary_writer = tf.train.SummaryWriter(hypes['dirs']['output_dir'],
-                                                graph=sess.graph)
+                                                graph_def=sess.graph_def)
 
         # And then after everything is built, start the training loop.
         solver = hypes['solver']
@@ -294,24 +324,26 @@ def run_training(hypes):
                 start_time = time.time()
 
             # Save a checkpoint and evaluate the model periodically.
-            if (step +1) % int(utils.cfg.step_eval) == 0 or (step + 1) == solver['max_steps']:
+            if (step + 1) % int(utils.cfg.step_eval) == 0 or \
+               (step + 1) == solver['max_steps']:
                 checkpoint_path = os.path.join(hypes['dirs']['output_dir'],
                                                'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
                 start_time = time.time()
                 # Evaluate against the training set.
 
-            if (step + 1) % int(utils.cfg.step_eval) == 0 or (step + 1) == solver['max_steps']:
+            if (step + 1) % int(utils.cfg.step_eval) == 0 or \
+               (step + 1) == solver['max_steps']:
 
                 logging.info('Doing Evaluate with Training Data.')
 
-                precision = do_eval(hypes, eval_correct, phase='train',
+                precision = do_eval(hypes, eval_dict, phase='train',
                                     sess=sess)
                 write_precision_to_summary(precision, summary_writer,
                                            "Train", step, sess)
 
                 logging.info('Doing Evaluation with Testing Data.')
-                precision = do_eval(hypes, eval_correct, phase='val',
+                precision = do_eval(hypes, eval_dict, phase='val',
                                     sess=sess)
                 write_precision_to_summary(precision, summary_writer,
                                            'val', step, sess)
