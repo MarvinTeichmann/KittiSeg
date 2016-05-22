@@ -283,7 +283,7 @@ def do_inference(hypes, modules, logdir):
         else:
             with open(val_json, 'r') as f:
                 eval_dict = json.load(f)
-                logging.dump(eval_dict)
+                logging.debug(eval_dict)
                 from IPython import embed
                 embed()
                 exit(0)
@@ -293,7 +293,7 @@ def do_inference(hypes, modules, logdir):
     eval_dict = eval_dataset(hypes, val_file, True, sess, image_pl, softmax)
 
     with open(val_json, 'w') as outfile:
-        json.dump(hypes, outfile, indent=2)
+        json.dump(eval_dict, outfile, indent=2)
 
     logging.info("Succesfully evaluated Dataset. Output is written to %s",
                  val_json)
