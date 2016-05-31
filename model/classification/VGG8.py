@@ -1,3 +1,9 @@
+"""
+VGG network architecture.
+
+See http://arxiv.org/abs/1409.1556
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -8,15 +14,15 @@ import tensorflow as tf
 
 
 def _activation_summary(x):
-    """Helper to create summaries for activations.
+    """
+    Create summaries for activations.
 
     Creates a summary that provides a histogram of activations.
     Creates a summary that measure the sparsity of activations.
 
-    Args:
-      x: Tensor
-    Returns:
-      nothing
+    Parameters
+    ----------
+    x : Tensor
     """
     # Remove 'tower_[0-9]/' from the name in case this is a multi-GPU training
     # session. This helps the clarity of presentation on tensorboard.
@@ -27,12 +33,16 @@ def _activation_summary(x):
 
 
 def _weight_variable(shape, stddev=0.01):
-    """Helper to create initialized weight Variables.
+    """
+    Create initialized weight variables.
 
-    Args:
-      name: name of the variable
-      shape: list of ints
-      stddev: standard deviation of a truncated Gaussian
+    Parameters
+    ----------
+    name : str
+        Name of the variable.
+    shape : list of ints
+    stddev : float
+        Standard deviation of a truncated Gaussian.
     """
     initializer = tf.truncated_normal_initializer(stddev=stddev)
     return tf.get_variable(name='weights', shape=shape,
@@ -50,17 +60,19 @@ def _variable_with_weight_decay(shape, stddev, wd):
     Note that the Variable is initialized with a truncated normal distribution.
     A weight decay is added only if one is specified.
 
-    Args:
-      name: name of the variable
-      shape: list of ints
-      stddev: standard deviation of a truncated Gaussian
-      wd: add L2Loss weight decay multiplied by this float. If None, weight
-          decay is not added for this Variable.
+    Parameters
+    ----------
+    name: name of the variable
+    shape: list of ints
+    stddev : float
+        Standard deviation of a truncated Gaussian.
+    wd: add L2Loss weight decay multiplied by this float. If None, weight
+      decay is not added for this variable.
 
-    Returns:
-      Variable Tensor
+    Returns
+    -------
+    Variable Tensor
     """
-
     initializer = tf.truncated_normal_initializer(stddev=stddev)
     var = tf.get_variable('weights', shape=shape,
                           initializer=initializer)
@@ -74,7 +86,14 @@ def _variable_with_weight_decay(shape, stddev, wd):
 def _conv_layer(name, bottom, num_filter,
                 ksize=[3, 3], strides=[1, 1, 1, 1], padding='SAME'):
     with tf.variable_scope(name) as scope:
+        # get number of input channels
         n = bottom.get_shape()[3].value
+        if n is None:
+            # if placeholder are used, n might be undefined
+            # this should only happen in the first layer.
+            logging.warning("None type in Layer: %s", name)
+            # Assume RGB image in that case.
+            n = 3
         logging.debug("Layer: %s, Fan-in: %d" % (name, n))
         shape = [ksize[0], ksize[1], n, num_filter]
         num_input = ksize[0] * ksize[1] * n
@@ -150,14 +169,15 @@ def _logits(bottom, num_classes):
 def inference(hypes, images, train=True):
     """Build the MNIST model up to where it may be used for inference.
 
-    Args:
-      images: Images placeholder, from inputs().
-      train: whether the network is used for train of inference
+    Parameters
+    ----------
+    images : Images placeholder, from inputs().
+    train : whether the network is used for train of inference
 
-    Returns:
-      softmax_linear: Output tensor with the computed logits.
+    Returns
+    -------
+    softmax_linear : Output tensor with the computed logits.
     """
-
     # First Block of Convolutional Layers
     # with tf.name_scope('Pool1') as scope:
     conv1_1 = _conv_layer(name="conv1_1", bottom=images, num_filter=32)

@@ -76,7 +76,14 @@ def _variable_with_weight_decay(shape, stddev, wd):
 def _conv_layer(name, bottom, num_filter,
                 ksize=[3, 3], strides=[1, 1, 1, 1], wd=5e-3, padding='SAME'):
     with tf.variable_scope(name) as scope:
+        # get number of input channels
         n = bottom.get_shape()[3].value
+        if n is None:
+            # if placeholder are used, n might be undefined
+            # this should only happen in the first layer.
+            logging.warning("None type in Layer: %s", name)
+            # Assume RGB image in that case.
+            n = 3
         logging.debug("Layer: %s, Fan-in: %d" % (name, n))
         shape = [ksize[0], ksize[1], n, num_filter]
         num_input = ksize[0] * ksize[1] * n

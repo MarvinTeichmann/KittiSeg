@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Thu Dec 17 11:50:47 2015
+Created on Thu Dec 17 11:50:47 2015.
 
 @author: teichman
 """
@@ -34,9 +34,10 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
 
 
 def _load_gt_file(hypes, data_file=None):
-    """Take the data_file and hypes and create a generator
-    that outputs the image and the gt_image. """
+    """Take the data_file and hypes and create a generator.
 
+    The generator outputs the image and the gt_image.
+    """
     base_path = os.path.realpath(os.path.dirname(data_file))
     files = [line.rstrip() for line in open(data_file)]
 
@@ -58,10 +59,7 @@ def _load_gt_file(hypes, data_file=None):
 
 
 def _make_data_gen(hypes, phase, data_dir):
-    """Returns a data generator that outputs image samples."""
-
-    """Returns a data generator that outputs image samples."""
-
+    """Return a data generator that outputs image samples."""
     if phase == 'train':
         data_file = hypes['data']["train_file"]
     elif phase == 'val':
@@ -99,9 +97,8 @@ def _make_data_gen(hypes, phase, data_dir):
             yield np.flipud(np.fliplr(image)), np.flipud(np.fliplr(gt_image))
 
 
-
-
 def create_queues(hypes, phase):
+    """Create Queues."""
     arch = hypes['arch']
     dtypes = [tf.float32, tf.int32]
     shapes = (
@@ -116,8 +113,8 @@ def create_queues(hypes, phase):
     return q
 
 
-def start_enqueuing_threads(hypes, q, sess, data_dir):
-
+def start_enqueuing_threads(hypes, q, phase, sess, data_dir):
+    """Start enqueuing threads."""
     shape = [hypes['arch']['image_height'], hypes['arch']['image_width'],
              hypes['arch']['num_channels']]
     image_pl = tf.placeholder(tf.float32,
@@ -136,26 +133,23 @@ def start_enqueuing_threads(hypes, q, sess, data_dir):
     def enqueue_loop(sess, enqueue_op, phase, gen):
         # infinity loop enqueueing data
         for d in gen:
-            sess.run(enqueue_op[phase], feed_dict=make_feed(d))
+            sess.run(enqueue_op, feed_dict=make_feed(d))
 
     threads = []
-    enqueue_op = {}
-    for phase in ['train', 'val']:
-        # enqueue once manually to avoid thread start delay
-        enqueue_op[phase] = q[phase].enqueue((image_pl, label_pl))
-        gen = _make_data_gen(hypes, phase, data_dir)
-        data = gen.next()
-        sess.run(enqueue_op[phase], feed_dict=make_feed(data))
-        num_threads = 4
-        for i in range(num_threads):
-            threads.append(tf.train.threading.Thread(target=enqueue_loop,
-                                                     args=(sess, enqueue_op,
-                                                           phase, gen)))
-        threads[-1].start()
+    enqueue_op = q.enqueue((image_pl, label_pl))
+    gen = _make_data_gen(hypes, phase, data_dir)
+    gen.next()
+    # sess.run(enqueue_op, feed_dict=make_feed(data))
+    num_threads = 4
+    for i in range(num_threads):
+        threads.append(tf.train.threading.Thread(target=enqueue_loop,
+                                                 args=(sess, enqueue_op,
+                                                       phase, gen)))
+    threads[-1].start()
 
 
 def _read_processed_image(q, phase):
-    image, label = q[phase].dequeue()
+    image, label = q.dequeue()
     if phase == 'train':
 
         # Because these operations are not commutative, consider randomizing
@@ -169,6 +163,7 @@ def _read_processed_image(q, phase):
 
 
 def inputs(hypes, q, phase, data_dir):
+    """Generate Inputs."""
     num_threads = 4
     example_list = [_read_processed_image(q, phase)
                     for i in range(num_threads)]
@@ -190,7 +185,7 @@ def inputs(hypes, q, phase, data_dir):
 
 
 def main():
-
+    """main."""
     with open('../hypes/kitti_seg.json', 'r') as f:
         hypes = json.load(f)
 
