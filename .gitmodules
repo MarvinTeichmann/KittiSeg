@@ -1,0 +1,3 @@
+[submodule "model/vgg/tensorflow-fcn"]
+	path = model/vgg/tensorflow-fcn
+	url = git@github.com:MarvinTeichmann/tensorflow-fcn.git
