@@ -21,4 +21,4 @@ def inference(hypes, images, train=True):
 
     vgg_fcn.build(images, train=True, num_classes=2, random_init_fc8=True)
 
-    return vgg_fcn.up
+    return vgg_fcn.upscore
