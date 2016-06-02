@@ -259,7 +259,12 @@ def do_inference(hypes, modules, logdir):
 
         image = tf.expand_dims(image_pl, 0)
 
-        image = tf.image.per_image_whitening(image)
+        if 'whitening' not in hypes['arch'] or \
+                hypes['arch']['whitening']:
+            image = tf.image.per_image_whitening(image)
+            logging.info('Whitening is enabled.')
+        else:
+            logging.info('Whitening is disabled.')
 
         # build the graph based on the loaded modules
         softmax = build_inference_graph(hypes, modules,
@@ -293,7 +298,8 @@ def do_inference(hypes, modules, logdir):
     eval_dict = eval_dataset(hypes, val_file, True, sess, image_pl, softmax)
 
     with open(val_json, 'w') as outfile:
-        json.dump(eval_dict, outfile, indent=2)
+        # json.dump(eval_dict, outfile, indent=2)
+        logging.info("Dumping currently not supported")
 
     logging.info("Succesfully evaluated Dataset. Output is written to %s",
                  val_json)

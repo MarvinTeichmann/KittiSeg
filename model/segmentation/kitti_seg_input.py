@@ -105,7 +105,7 @@ def create_queues(hypes, phase):
         [arch['image_height'], arch['image_width'], arch['num_channels']],
         [arch['image_height'], arch['image_width'], arch['num_classes']],)
     capacity = 100
-    q = tf.FIFOQueue(capacity=100, dtypes=dtypes, shapes=shapes)
+    q = tf.FIFOQueue(capacity=100, dtypes=dtypes)
     tf.scalar_summary("queue/%s/fraction_of_%d_full" %
                       (q.name + phase, capacity),
                       math_ops.cast(q.size(), tf.float32) * (1. / capacity))
@@ -117,14 +117,12 @@ def start_enqueuing_threads(hypes, q, phase, sess, data_dir):
     """Start enqueuing threads."""
     shape = [hypes['arch']['image_height'], hypes['arch']['image_width'],
              hypes['arch']['num_channels']]
-    image_pl = tf.placeholder(tf.float32,
-                              shape=shape)
+    image_pl = tf.placeholder(tf.float32)
 
     # Labels
     shape = [hypes['arch']['image_height'], hypes['arch']['image_width'],
              hypes['arch']['num_classes']]
-    label_pl = tf.placeholder(tf.int32,
-                              shape=shape)
+    label_pl = tf.placeholder(tf.int32)
 
     def make_feed(data):
         image, label = data
@@ -148,7 +146,7 @@ def start_enqueuing_threads(hypes, q, phase, sess, data_dir):
     threads[-1].start()
 
 
-def _read_processed_image(q, phase):
+def _read_processed_image(hypes, q, phase):
     image, label = q.dequeue()
     if phase == 'train':
 
@@ -157,15 +155,28 @@ def _read_processed_image(q, phase):
         image = tf.image.random_brightness(image, max_delta=63)
         image = tf.image.random_contrast(image, lower=0.2, upper=1.8)
 
-    image = tf.image.per_image_whitening(image)
+    if 'whitening' not in hypes['arch'] or \
+            hypes['arch']['whitening']:
+        image = tf.image.per_image_whitening(image)
+        logging.info('Whitening is enabled.')
+    else:
+        logging.info('Whitening is disabled.')
 
     return image, label
 
 
 def inputs(hypes, q, phase, data_dir):
     """Generate Inputs."""
+
+    if 'whitening' in hypes['arch'] and \
+            not hypes['arch']['whitening']:
+            image, label = _read_processed_image(hypes, q, phase)
+            image = tf.expand_dims(image, 0)
+            label = tf.expand_dims(label, 0)
+            return image, label
+
     num_threads = 4
-    example_list = [_read_processed_image(q, phase)
+    example_list = [_read_processed_image(hypes, q, phase)
                     for i in range(num_threads)]
 
     batch_size = hypes['solver']['batch_size']
