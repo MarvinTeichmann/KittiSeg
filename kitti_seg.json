@@ -20,7 +20,7 @@
     "image_size" : 50,
     "image_height" : 290,
     "image_width" : 960,
-    "weight": [1, 1],
+    "weight": [1, 4.56],
     "num_channels" : 3
   },
 

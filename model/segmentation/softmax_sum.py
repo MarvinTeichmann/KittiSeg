@@ -33,29 +33,17 @@ def loss(hypes, logits, labels):
     Returns:
       loss: Loss tensor of type float.
     """
-    # Convert from sparse integer labels in the range [0, NUM_CLASSSES)
-    # to 1-hot dense float vectors (that is we will have batch_size vectors,
-    # each with NUM_CLASSES values, all of which are 0.0 except there will
-    # be a 1.0 in the entry corresponding to the label).
     with tf.name_scope('loss'):
         logits = tf.reshape(logits, (-1, 2))
         shape = [logits.get_shape()[0], 2]
-        epsilon = tf.constant(value=hypes['solver']['epsilon'], shape=shape)
+        epsilon = tf.constant(value=hypes['solver']['epsilon'])
         logits = logits + epsilon
         labels = tf.to_float(tf.reshape(labels, (-1, 2)))
 
         softmax = tf.nn.softmax(logits)
-        # softmax = tf.Print(softmax, [tf.reduce_min(softmax)],
-        #                     message='Checking for negative: ')
         head = hypes['arch']['weight']
         cross_entropy = -tf.reduce_sum(tf.mul(labels * tf.log(softmax), head),
                                        reduction_indices=[1])
-
-        # TODO Check!
-
-        # cross_entropy = tf.Print(cross_entropy, [tf.reduce_max(cross_entropy)
-        # ],
-        #                          message='Checking max of entropy: ')
 
         cross_entropy_mean = tf.reduce_mean(cross_entropy,
                                             name='xentropy_mean')
@@ -115,5 +103,3 @@ def create_image_summary(hypes, image, logits, labels):
 
     Returns:
     """
-
-    
