@@ -205,9 +205,9 @@ def do_kitti_eval_with_training_data(hypes, sess, image_pl, softmax):
     """."""
     show_dict = ['MaxF', 'BestThresh', 'AvgPrec', 'PRE_wp', 'REC_wp',
                  'FPR_wp', 'FNR_wp']
-    eval_files = ['val.txt', 'val2.txt', 'um.txt', 'umm.txt', 'uu.txt']
-    eval_names = ['Validation Data 960', 'Validation Data',
-                  'Urban Marked', 'Urban Multi Marked', 'Urban Unmarked']
+    eval_files = ['val2.txt', 'um.txt', 'umm.txt', 'uu.txt']
+    eval_names = ['Validation Data', 'Urban Marked',
+                  'Urban Multi Marked', 'Urban Unmarked']
 
     for file, name in zip(eval_files, eval_names):
         data_file = os.path.join('data_road', file)
@@ -294,7 +294,7 @@ def do_inference(hypes, modules, logdir):
                 exit(0)
 
     logging.info("Doing evaluation with Validation Data")
-    val_file = os.path.join(hypes['dirs']['data_dir'], 'data_road/val.txt')
+    val_file = os.path.join(hypes['dirs']['data_dir'], 'data_road/val2.txt')
     eval_dict = eval_dataset(hypes, val_file, True, sess, image_pl, softmax)
 
     with open(val_json, 'w') as outfile:
