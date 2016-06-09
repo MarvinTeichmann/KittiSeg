@@ -1,3 +1,6 @@
 [submodule "model/vgg/tensorflow-fcn"]
 	path = model/vgg/tensorflow_fcn
 	url = git@github.com:MarvinTeichmann/tensorflow-fcn.git
+[submodule "TensorVision"]
+	path = TensorVision
+	url = git@github.com:TensorVision/TensorVision.git
