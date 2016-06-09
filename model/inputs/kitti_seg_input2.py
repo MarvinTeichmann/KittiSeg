@@ -107,8 +107,8 @@ def create_queues(hypes, phase):
     shapes = (
         [arch['image_height'], arch['image_width'], arch['num_channels']],
         [arch['image_height'], arch['image_width'], arch['num_classes']],)
-    capacity = 100
-    q = tf.FIFOQueue(capacity=100, dtypes=dtypes)
+    capacity = 50
+    q = tf.FIFOQueue(capacity=50, dtypes=dtypes)
     tf.scalar_summary("queue/%s/fraction_of_%d_full" %
                       (q.name + "_" + phase, capacity),
                       math_ops.cast(q.size(), tf.float32) * (1. / capacity))
@@ -141,7 +141,10 @@ def start_enqueuing_threads(hypes, q, phase, sess, data_dir):
     gen = _make_data_gen(hypes, phase, data_dir)
     gen.next()
     # sess.run(enqueue_op, feed_dict=make_feed(data))
-    num_threads = 4
+    if phase == 'val':
+        num_threads = 1
+    else:
+        num_threads = hypes["solver"]["threads"]
     for i in range(num_threads):
         threads.append(tf.train.threading.Thread(target=enqueue_loop,
                                                  args=(sess, enqueue_op,
@@ -213,7 +216,13 @@ def shuffle_join(tensor_list_list, capacity,
 
 def inputs(hypes, q, phase, data_dir):
     """Generate Inputs images."""
-    num_threads = 4
+    if phase == 'val':
+        image, label = _read_processed_image(hypes, q, phase)
+        image = tf.expand_dims(image, 0)
+        label = tf.expand_dims(label, 0)
+        return image, label
+
+    num_threads = hypes["solver"]["threads"]
     example_list = [_read_processed_image(hypes, q, phase)
                     for i in range(num_threads)]
     minad = 50
