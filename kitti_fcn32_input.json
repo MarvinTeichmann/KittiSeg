@@ -31,7 +31,8 @@
   "solver": {
       "opt": null,
       "batch_size": 1,
-      "epsilon": 0.00001, 
+      "epsilon": 0.00001,
+      "threads": 4,
       "learning_rate": 1e-6, 
       "max_steps": 20000
   }
