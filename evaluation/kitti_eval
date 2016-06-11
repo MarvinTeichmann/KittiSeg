@@ -42,14 +42,12 @@ import tensorflow as tf
 
 import tensorvision.utils as utils
 import tensorvision.core as core
+import tensorvision.analyze as ana
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('logdir', None,
-                    'Directory where logs are stored.')
-
-flags.DEFINE_bool('kitti_eval', False,
+flags.DEFINE_bool('kitti_eval', True,
                   'Do full epoche of Kitti train Evaluation.')
 
 flags.DEFINE_bool('inspect', False,
@@ -139,6 +137,62 @@ def eval_image(hypes, gt_image, cnn_image):
 
     return FN, FP, posNum, negNum
 
+import random
+
+
+def tensor_eval(hypes, sess, image_pl, softmax):
+    data_dir = hypes['dirs']['data_dir']
+    data_file = hypes['data']['val_file']
+    data_file = os.path.join(data_dir, data_file)
+    image_dir = os.path.dirname(data_file)
+
+    thresh = np.array(range(0, 256))/255.0
+    total_fp = np.zeros(thresh.shape)
+    total_fn = np.zeros(thresh.shape)
+    total_posnum = 0
+    total_negnum = 0
+
+    images = []
+
+    with open(data_file) as file:
+        for datum in file:
+                datum = datum.rstrip()
+                image_file, gt_file = datum.split(" ")
+                image_file = os.path.join(image_dir, image_file)
+                gt_file = os.path.join(image_dir, gt_file)
+
+                image = scp.misc.imread(image_file)
+                gt_image = scp.misc.imread(gt_file)
+                shape = image.shape
+
+                feed_dict = {image_pl: image}
+
+                output = sess.run([softmax], feed_dict=feed_dict)
+                output_im = output[0][:, 1].reshape(shape[0], shape[1])
+
+                if random.random() < 0.1:
+                    ov_image = seg.make_overlay(image, output_im)
+                    images.append(ov_image)
+
+                FN, FP, posNum, negNum = eval_image(hypes, gt_image, output_im)
+
+                total_fp += FP
+                total_fn += FN
+                total_posnum += posNum
+                total_negnum += negNum
+
+    eval_dict = seg.pxEval_maximizeFMeasure(total_posnum, total_negnum,
+                                            total_fn, total_fp,
+                                            thresh=thresh)
+
+    eval_list = []
+
+    eval_list.append(('MaxF1', 100*eval_dict['MaxF']))
+    eval_list.append(('BestThresh', 100*eval_dict['BestThresh']))
+    eval_list.append(('Average Precision', 100*eval_dict['AvgPrec']))
+
+    return eval_list, images
+
 
 def eval_dataset(hypes, data_file, save_overlay,
                  sess, image_pl, softmax):
@@ -205,9 +259,14 @@ def do_kitti_eval_with_training_data(hypes, sess, image_pl, softmax):
     """."""
     show_dict = ['MaxF', 'BestThresh', 'AvgPrec', 'PRE_wp', 'REC_wp',
                  'FPR_wp', 'FNR_wp']
-    eval_files = ['val2.txt', 'um.txt', 'umm.txt', 'uu.txt']
+    eval_files = ['val3.txt', 'um.txt', 'umm.txt', 'uu.txt']
     eval_names = ['Validation Data', 'Urban Marked',
                   'Urban Multi Marked', 'Urban Unmarked']
+
+    logging_file = os.path.join(hypes['dirs']['eval_out'], 'kitti.log')
+    filewriter = _get_filewrite_handler(logging_file)
+    rootlog = logging.getLogger('')
+    rootlog.addHandler(filewriter)
 
     for file, name in zip(eval_files, eval_names):
         data_file = os.path.join('data_road', file)
@@ -221,15 +280,10 @@ def do_kitti_eval_with_training_data(hypes, sess, image_pl, softmax):
 
         factor = 100
 
-        logging_file = os.path.join(hypes['dirs']['eval_out'], 'kitti.log')
-        filewriter = _get_filewrite_handler(logging_file)
-        rootlog = logging.getLogger('')
-        rootlog.addHandler(filewriter)
-
         for metric in show_dict:
             logging.info('%s: %4.2f', metric, eval_val_dict[metric]*factor)
 
-        rootlog.removeHandler(filewriter)
+    rootlog.removeHandler(filewriter)
 
 
 def do_inference(hypes, modules, logdir):
@@ -294,7 +348,8 @@ def do_inference(hypes, modules, logdir):
                 exit(0)
 
     logging.info("Doing evaluation with Validation Data")
-    val_file = os.path.join(hypes['dirs']['data_dir'], 'data_road/val2.txt')
+    val_file = os.path.join(hypes['dirs']['data_dir'],
+                            hypes['data']['val_file'])
     eval_dict = eval_dataset(hypes, val_file, True, sess, image_pl, softmax)
 
     with open(val_json, 'w') as outfile:
@@ -311,18 +366,22 @@ def do_inference(hypes, modules, logdir):
 
     logging.info('Statistics on Validation Data.')
 
-    logging.info('MaxF1          : %4.2f', eval_dict['MaxF'])
-    logging.info('BestThresh     : %4.2f', eval_dict['BestThresh'])
-    logging.info('Avg Precision  : %4.2f', eval_dict['AvgPrec'])
+    logging.info('MaxF1          : %4.2f', 100*eval_dict['MaxF'])
+    logging.info('BestThresh     : %4.2f', 100*eval_dict['BestThresh'])
+    logging.info('Avg Precision  : %4.2f', 100*eval_dict['AvgPrec'])
     logging.info('')
     ind5 = np.where(eval_dict['thresh'] >= 0.5)[0][0]
-    logging.info('Precision @ 0.5: %4.2f', eval_dict['precision'][ind5])
-    logging.info('Recall    @ 0.5: %4.2f', eval_dict['recall'][ind5])
-    logging.info('TPR       @ 0.5: %4.2f', eval_dict['recall'][ind5])
-    logging.info('TNR       @ 0.5: %4.2f', eval_dict['TNR'][ind5])
+    logging.info('Precision @ 0.5: %4.2f', 100*eval_dict['precision'][ind5])
+    logging.info('Recall    @ 0.5: %4.2f', 100*eval_dict['recall'][ind5])
+    logging.info('TPR       @ 0.5: %4.2f', 100*eval_dict['recall'][ind5])
+    logging.info('TNR       @ 0.5: %4.2f', 100*eval_dict['TNR'][ind5])
 
     if FLAGS.kitti_eval:
         do_kitti_eval_with_training_data(hypes, sess, image_pl, softmax)
+
+    rootlog.removeHandler(filewriter)
+
+    ana.do_analyze(FLAGS.logdir)
     # training_cats = []
 
 

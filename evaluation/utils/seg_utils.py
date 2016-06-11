@@ -63,14 +63,14 @@ def evalExp(gtBin, cur_prob, thres, validMap = None, validArea=None):
     thresInf = np.concatenate(([-np.Inf], thres, [np.Inf]))
     
     #Merge validMap with validArea
-    if validMap!=None:
-        if validArea!=None:
+    if validMap is not None:
+        if validArea is not None:
             validMap = (validMap == True) & (validArea == True)
-    elif validArea!=None:
+    elif validArea is not None:
         validMap=validArea
 
     # histogram of false negatives
-    if validMap!=None:
+    if validMap is not None:
         fnArray = cur_prob[(gtBin == True) & (validMap == True)]
     else:
         fnArray = cur_prob[(gtBin == True)]
@@ -78,7 +78,7 @@ def evalExp(gtBin, cur_prob, thres, validMap = None, validArea=None):
     fnCum = np.cumsum(fnHist)
     FN = fnCum[0:0+len(thres)];
     
-    if validMap!=None:
+    if validMap is not None:
         fpArray = cur_prob[(gtBin == False) & (validMap == True)]
     else:
         fpArray = cur_prob[(gtBin == False)]
@@ -90,7 +90,7 @@ def evalExp(gtBin, cur_prob, thres, validMap = None, validArea=None):
     # count labels and protos
     #posNum = fnArray.shape[0]
     #negNum = fpArray.shape[0]
-    if validMap!=None:
+    if validMap is not None:
         posNum = np.sum((gtBin == True) & (validMap == True))
         negNum = np.sum((gtBin == False) & (validMap == True))
     else:
@@ -175,7 +175,7 @@ def pxEval_maximizeFMeasure(totalPosNum, totalNegNum, totalFN, totalFP, thresh =
     #prob_eval_scores['precision_bst'] = precision_bst
     #prob_eval_scores['recall_bst'] = recall_bst
     prob_eval_scores['thresh'] = thresh
-    if thresh != None:
+    if thresh is not None:
         BestThresh= thresh[index]
         prob_eval_scores['BestThresh'] = BestThresh
 
