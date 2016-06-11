@@ -7,8 +7,8 @@
   },
 
   "data": {
-    "train_file" : "data_road/train3.txt",
-    "val_file" : "data_road/val3.txt",
+    "train_file" : "data_road/train2.txt",
+    "val_file" : "data_road/val2.txt",
     "num_examples_per_epoch_for_train" : 200,
     "num_examples_per_epoch_for_eval" : 50,
     "road_color" : [255,0,255],
@@ -20,7 +20,7 @@
     "image_size" : 50,
     "image_height" : 375,
     "image_width" : 1242,
-    "weight": [1, 1.75],
+    "weight": [1, 4.56],
     "num_channels" : 3,
     "whitening": false
   },
@@ -33,7 +33,10 @@
       "batch_size": 1,
       "epsilon": 0.00001,
       "threads": 4,
-      "learning_rate": 1e-5, 
-      "max_steps": 20000
+      "learning_rate": 1e-6, 
+      "max_steps": 25000,
+
+      "learning_rates": [1e-5, 1e-6, 1e-7]
+      "steps": [0, 12000, 20000]
   }
 }

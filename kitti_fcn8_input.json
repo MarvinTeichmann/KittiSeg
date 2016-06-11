@@ -1,8 +1,8 @@
 {
   "model": {
-    "input_file": "model/inputs/kitti_seg_input3.py",
-    "architecture_file" : "model/vgg/fcn32_vgg.py",
-    "objective_file" : "model/segmentation/kitti_obj.py",
+    "input_file": "model/inputs/kitti_seg_input_low.py",
+    "architecture_file" : "model/vgg/fcn8_vgg.py",
+    "objective_file" : "model/segmentation/softmax_sum.py",
     "optimizer_file" : "model/segmentation/adam_optimizer.py"
   },
 
