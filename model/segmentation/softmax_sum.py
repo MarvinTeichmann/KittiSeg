@@ -93,13 +93,58 @@ def evaluation(hypes, logits, labels):
         return eval_list
 
 
-def create_image_summary(hypes, image, logits, labels):
-    """Create an output im.
+import random
 
-    Args:
-      logits: Logits tensor, float - [batch_size, NUM_CLASSES].
-      labels: Labels tensor, int32 - [batch_size], with values in the
-        range [0, NUM_CLASSES).
 
-    Returns:
-    """
+def tensor_eval(hypes, sess, image_pl, softmax):
+    data_dir = hypes['dirs']['data_dir']
+    data_file = hypes['data']['val_file']
+    data_file = os.path.join(data_dir, data_file)
+    image_dir = os.path.dirname(data_file)
+
+    thresh = np.array(range(0, 256))/255.0
+    total_fp = np.zeros(thresh.shape)
+    total_fn = np.zeros(thresh.shape)
+    total_posnum = 0
+    total_negnum = 0
+
+    images = []
+
+    with open(data_file) as file:
+        for datum in file:
+                datum = datum.rstrip()
+                image_file, gt_file = datum.split(" ")
+                image_file = os.path.join(image_dir, image_file)
+                gt_file = os.path.join(image_dir, gt_file)
+
+                image = scp.misc.imread(image_file)
+                gt_image = scp.misc.imread(gt_file)
+                shape = image.shape
+
+                feed_dict = {image_pl: image}
+
+                output = sess.run([softmax], feed_dict=feed_dict)
+                output_im = output[0][:, 1].reshape(shape[0], shape[1])
+
+                if random.random() < 0.1:
+                    ov_image = seg.make_overlay(image, output_im)
+                    images.append(ov_image)
+
+                FN, FP, posNum, negNum = eval_image(hypes, gt_image, output_im)
+
+                total_fp += FP
+                total_fn += FN
+                total_posnum += posNum
+                total_negnum += negNum
+
+    eval_dict = seg.pxEval_maximizeFMeasure(total_posnum, total_negnum,
+                                            total_fn, total_fp,
+                                            thresh=thresh)
+
+    eval_list = []
+
+    eval_list.append(('MaxF1', 100*eval_dict['MaxF']))
+    eval_list.append(('BestThresh', 100*eval_dict['BestThresh']))
+    eval_list.append(('Average Precision', 100*eval_dict['AvgPrec']))
+
+    return eval_list, images
