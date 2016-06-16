@@ -76,6 +76,7 @@ def evaluation(hypes, logits, labels):
     # It returns a bool tensor with shape [batch_size] that is true for
     # the examples where the label's is was in the top k (here k=1)
     # of all logits for that example.
+    return None
     with tf.name_scope('eval'):
         logits = tf.reshape(logits, (-1, 2))
         labels = tf.reshape(labels, (-1, 2))

@@ -102,10 +102,10 @@ def _make_data_gen(hypes, phase, data_dir):
 
 
 def jitter_input(hypes, image, gt_image):
-    lower_size = 0.36
-    upper_size = 1.8
-    sig = 0.33
-    res_chance = 0.8
+    lower_size = 0.4
+    upper_size = 1.7
+    sig = 0.15
+    res_chance = 0.4
 
     max_crop = 32
     crop_chance = 0.95

@@ -105,7 +105,7 @@ def jitter_input(hypes, image, gt_image):
     lower_size = 0.4
     upper_size = 1.7
     sig = 0.25
-    res_chance = 0.6
+    res_chance = 0.5
 
     max_crop = 32
     crop_chance = 0.95
@@ -226,9 +226,9 @@ def _read_processed_image(hypes, q, phase):
         # Because these operations are not commutative, consider randomizing
         # randomize the order their operation.
         image = tf.image.random_brightness(image, max_delta=35)
-        image = tf.image.random_contrast(image, lower=0.5, upper=1.6)
-        image = tf.image.random_hue(image, max_delta=0.15)
-        image = tf.image.random_saturation(image, lower=0.8, upper=1.3)
+        image = tf.image.random_contrast(image, lower=0.5, upper=1.5)
+        # image = tf.image.random_hue(image, max_delta=0.15)
+        # image = tf.image.random_saturation(image, lower=0.8, upper=1.3)
 
     if 'whitening' not in hypes['arch'] or \
             hypes['arch']['whitening']:

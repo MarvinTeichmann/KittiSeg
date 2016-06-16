@@ -1,14 +1,14 @@
 {
   "model": {
-    "input_file": "model/segmentation/kitti_seg_input.py",
+    "input_file": "model/inputs/kitti_seg_input3.py",
     "architecture_file" : "model/vgg/fcn8_vgg.py",
-    "objective_file" : "model/segmentation/softmax_sum.py",
+    "objective_file" : "model/segmentation/kitti_obj.py",
     "optimizer_file" : "model/segmentation/adam_optimizer.py"
   },
 
   "data": {
-    "train_file" : "data_road/train2.txt",
-    "val_file" : "data_road/val2.txt",
+    "train_file" : "data_road/train3.txt",
+    "val_file" : "data_road/val3.txt",
     "num_examples_per_epoch_for_train" : 200,
     "num_examples_per_epoch_for_eval" : 50,
     "road_color" : [255,0,255],
@@ -18,9 +18,9 @@
   "arch": {
     "num_classes" : 2,
     "image_size" : 50,
-    "image_height" : 290,
-    "image_width" : 960,
-    "weight": [1, 1],
+    "image_height" : 375,
+    "image_width" : 1242,
+    "weight": [1, 1.75],
     "num_channels" : 3,
     "whitening": false
   },
@@ -31,8 +31,9 @@
   "solver": {
       "opt": null,
       "batch_size": 1,
-      "epsilon": 0.00001, 
-      "learning_rate": 1e-6, 
+      "epsilon": 0.00001,
+      "threads": 4,
+      "learning_rate": 1e-5, 
       "max_steps": 20000
   }
 }
