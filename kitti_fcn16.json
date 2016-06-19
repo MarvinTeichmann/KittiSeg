@@ -7,8 +7,8 @@
   },
 
   "data": {
-    "train_file" : "data_road/all3.txt",
-    "val_file" : "data_road/all3.txt",
+    "train_file" : "data_road/train3.txt",
+    "val_file" : "data_road/val3.txt",
     "num_examples_per_epoch_for_train" : 200,
     "num_examples_per_epoch_for_eval" : 50,
     "road_color" : [255,0,255],
