@@ -119,6 +119,8 @@ def pxEval_maximizeFMeasure(totalPosNum, totalNegNum, totalFN, totalFP, thresh =
     recall = totalTP / float( totalPosNum )
     TNR    = totalTN / float( totalNegNum )
     precision =  totalTP / (totalTP + totalFP + 1e-10)
+
+    accuracy = (totalTP + totalTN) / (float( totalPosNum ) + float( totalNegNum ))
     
     selector_invalid = (recall==0) & (precision==0)
     recall = recall[~selector_invalid]
@@ -163,6 +165,7 @@ def pxEval_maximizeFMeasure(totalPosNum, totalNegNum, totalFN, totalFP, thresh =
     prob_eval_scores  = calcEvalMeasures(valuesMaxF)
     prob_eval_scores['AvgPrec'] = AvgPrec
     prob_eval_scores['MaxF'] = MaxF
+    prob_eval_scores['accuracy'] = accuracy
 
     #prob_eval_scores['totalFN'] = totalFN
     #prob_eval_scores['totalFP'] = totalFP

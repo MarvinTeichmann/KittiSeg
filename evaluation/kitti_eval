@@ -19,7 +19,7 @@ import scipy.misc
 
 import overlay_utils as overlay
 
-from utils import seg_utils as seg
+from kitti_devkit import seg_utils as seg
 
 # configure logging
 if 'TV_IS_DEV' in os.environ and os.environ['TV_IS_DEV']:
@@ -167,8 +167,12 @@ def tensor_eval(hypes, sess, image_pl, softmax):
 
                 feed_dict = {image_pl: image}
 
+                start_time = time.time()
                 output = sess.run([softmax], feed_dict=feed_dict)
+                duration = time.time() - start_time
+                duration = float(duration)*1000
                 output_im = output[0][:, 1].reshape(shape[0], shape[1])
+                print('Duration %.3f ms' % (duration))
 
                 if random.random() < 0.1:
                     ov_image = seg.make_overlay(image, output_im)
@@ -223,8 +227,11 @@ def eval_dataset(hypes, data_file, save_overlay,
                 shape = image.shape
 
                 feed_dict = {image_pl: image}
-
+                start_time = time.time()
                 output = sess.run([softmax], feed_dict=feed_dict)
+                duration = time.time() - start_time
+                duration = float(duration)*1000
+                print('Duration %.3f ms' % (duration))
                 output_im = output[0][:, 1].reshape(shape[0], shape[1])
 
                 if save_overlay:
