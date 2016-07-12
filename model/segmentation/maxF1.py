@@ -85,27 +85,27 @@ def evaluation(hypes, logits, labels):
     # It returns a bool tensor with shape [batch_size] that is true for
     # the examples where the label's is was in the top k (here k=1)
     # of all logits for that example.
-    return None
     with tf.name_scope('eval'):
-        logits = tf.reshape(logits, (-1, 2))
-        labels = tf.reshape(labels, (-1, 2))
 
-        pred = tf.argmax(logits, dimension=1)
+        num_classes = hypes['arch']['num_classes']
 
-        negativ = tf.to_int32(tf.equal(pred, 0))
-        tn = tf.reduce_sum(negativ*labels[:, 0])
-        fn = tf.reduce_sum(negativ*labels[:, 1])
+        logits = tf.reshape(logits, (-1, num_classes))
+        shape = [logits.get_shape()[0], num_classes]
+        epsilon = tf.constant(value=hypes['solver']['epsilon'])
+        # logits = logits + epsilon
+        labels = tf.to_float(tf.reshape(labels, (-1, num_classes)))
 
-        positive = tf.to_int32(tf.equal(pred, 1))
-        tp = tf.reduce_sum(positive*labels[:, 1])
-        fp = tf.reduce_sum(positive*labels[:, 0])
+        logits = tf.nn.softmax(logits)
+
+        intersection = tf.reduce_sum(labels*logits, reduction_indices=0)
+        union = tf.reduce_sum(labels+logits, reduction_indices=0) \
+            - intersection+epsilon
+
+        mean_iou = tf.reduce_mean(intersection/union, name='mean_iou')
 
         eval_list = []
 
-        eval_list.append(('Accuracy', (tn+tp)/(tn + fn + tp + fp)))
-        eval_list.append(('Precision', tp/(tp + fp)))
-        eval_list.append(('True BG', tn/(tn + fp)))
-        eval_list.append(('True Street [Recall]', tp/(tp + fn)))
+        eval_list.append(('mean_iou', mean_iou))
 
         return eval_list
 
@@ -123,7 +123,7 @@ def eval_image(hypes, gt_image, cnn_image):
     return FN, FP, posNum, negNum
 
 
-def tensor_eval(hypes, sess, image_pl, softmax):
+def evaluate(hypes, sess, image_pl, softmax):
     data_dir = hypes['dirs']['data_dir']
     data_file = hypes['data']['val_file']
     data_file = os.path.join(data_dir, data_file)
