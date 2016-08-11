@@ -9,14 +9,14 @@ import tensorflow as tf
 
 def get_learning_rate(hype, global_step):
     if "learning_rates" not in hype['solver']:
-        return hype['solver']['learning_rates']
+        return hype['solver']['learning_rate']
 
     for i, num in enumerate(hype['solver']['steps']):
         if global_step < num:
             return hype['solver']['learning_rates'][i-1]
 
 
-def training(hype, loss, global_step):
+def training(hype, loss, global_step, learning_rate):
     """Sets up the training Ops.
 
     Creates a summarizer to track the loss over time in TensorBoard.
@@ -39,7 +39,7 @@ def training(hype, loss, global_step):
     with tf.name_scope('train'):
         tf.scalar_summary(loss.op.name, loss)
         # Create the gradient descent optimizer with the given learning rate.
-        optimizer = tf.train.AdamOptimizer(hype['solver']['learning_rate'])
+        optimizer = tf.train.AdamOptimizer(learning_rate)
         # optimizer = tf.train.GradientDescentOptimizer(learning_rate)
         # Create a variable to track the global step.
         # Use the optimizer to apply the gradients that minimize the loss
