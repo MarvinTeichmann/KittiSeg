@@ -3,7 +3,7 @@
     "input_file": "model/inputs/kitti_seg_input_minimal.py",
     "architecture_file" : "model/vgg/fcn8_vgg.py",
     "objective_file" : "model/segmentation/kitti_obj.py",
-    "optimizer_file" : "model/segmentation/adam_optimizer.py"
+    "optimizer_file" : "model/generic_optimizer.py"
   },
 
   "data": {
@@ -29,11 +29,13 @@
   },
 
   "solver": {
-      "opt": null,
+      "opt": "RMS",
       "batch_size": 1,
       "epsilon": 0.00001,
       "threads": 4,
-      "learning_rate": 1e-5, 
+      "learning_rate": 1e-5,
+      "learning_rate_step": null,
       "max_steps": 20000
-  }
+  },
+  "clip_norm" : 1.0
 }

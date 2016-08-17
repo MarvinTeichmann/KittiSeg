@@ -35,6 +35,9 @@ import tensorvision.utils as utils
 flags.DEFINE_string('name', None,
                     'Append a name Tag to run.')
 
+flags.DEFINE_string('project', None,
+                    'Append a name Tag to run.')
+
 flags.DEFINE_string('hypes', 'kitti_fcn8.json',
                     'File storing model parameters.')
 
@@ -59,8 +62,7 @@ def main(_):
     utils.load_plugins()
 
     if 'TV_DIR_RUNS' in os.environ:
-        os.environ['TV_DIR_RUNS'] = os.path.join(os.environ['TV_DIR_RUNS'],
-                                                 'MediSeg')
+        os.environ['TV_DIR_RUNS'] = os.path.join(os.environ['TV_DIR_RUNS'])
     utils.set_dirs(hypes, tf.app.flags.FLAGS.hypes)
 
     utils._add_paths_to_sys(hypes)
