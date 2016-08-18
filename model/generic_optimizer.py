@@ -7,14 +7,28 @@ import sys
 import tensorflow as tf
 
 
+# def get_learning_rate(hypes, step):
+#    lr = hypes['solver']['learning_rate']
+#    lr_step = hypes['solver']['learning_rate_step']
+#    if lr_step is not None:
+#      adjusted_lr = (lr * 0.5 ** max(0, (step / lr_step) - 2))
+#        return adjusted_lr
+#    else:
+#        return lr
+
 def get_learning_rate(hypes, step):
-    lr = hypes['solver']['learning_rate']
-    lr_step = hypes['solver']['learning_rate_step']
-    if lr_step is not None:
-        adjusted_lr = (lr * 0.5 ** max(0, (step / lr_step) - 2))
-        return adjusted_lr
-    else:
-        return lr
+    if "learning_rates" not in hypes['solver']:
+        lr = hypes['solver']['learning_rate']
+        lr_step = hypes['solver']['learning_rate_step']
+        if lr_step is not None:
+            adjusted_lr = (lr * 0.5 ** max(0, (step / lr_step) - 2))
+            return adjusted_lr
+        else:
+            return lr
+
+    for i, num in enumerate(hypes['solver']['steps']):
+        if step < num:
+            return hypes['solver']['learning_rates'][i]
 
 
 def training(hypes, loss, global_step, learning_rate):

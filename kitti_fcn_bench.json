@@ -1,7 +1,7 @@
 {
   "model": {
     "input_file": "model/inputs/kitti_seg_input_minimal.py",
-    "architecture_file" : "model/vgg/fcn8_vgg.py",
+    "architecture_file" : "model/vgg/fcn8_vgg_fix.py",
     "objective_file" : "model/segmentation/kitti_obj.py",
     "optimizer_file" : "model/generic_optimizer.py"
   },
@@ -29,7 +29,7 @@
   },
 
   "solver": {
-      "opt": "RMS",
+      "opt": "Adam",
       "batch_size": 1,
       "epsilon": 0.00001,
       "threads": 4,
