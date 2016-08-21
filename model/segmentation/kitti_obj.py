@@ -136,13 +136,30 @@ def evaluate(hypes, sess, image_pl, softmax):
                 gt_file = os.path.join(image_dir, gt_file)
 
                 image = scp.misc.imread(image_file)
-                gt_image = scp.misc.imread(gt_file)
-                shape = image.shape
 
-                feed_dict = {image_pl: image}
+                if hypes['jitter']['reseize_input']:
+                    image_height = hypes['jitter']['image_height']
+                    image_width = hypes['jitter']['image_width']
+                    input_image = scp.misc.imresize(
+                        image, size=(image_height, image_width),
+                        interp='bilinear')
+                else:
+                    input_image = image
+
+                shape = input_image.shape
+
+                gt_image = scp.misc.imread(gt_file)
+                feed_dict = {image_pl: input_image}
 
                 output = sess.run([softmax], feed_dict=feed_dict)
                 output_im = output[0][:, 1].reshape(shape[0], shape[1])
+
+                if hypes['jitter']['reseize_input']:
+                    gt_shape = gt_image.shape
+                    output_im = scp.misc.imresize(output_im,
+                                                  size=(gt_shape[0],
+                                                        gt_shape[1]),
+                                                  interp='bilinear')
 
                 if i % 5 == 0:
                     ov_image = seg.make_overlay(image, output_im)
