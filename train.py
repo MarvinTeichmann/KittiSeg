@@ -28,9 +28,10 @@ import tensorflow as tf
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
+sys.path.insert(1, 'incl')
+
 import tensorvision.train as train
 import tensorvision.utils as utils
-
 
 flags.DEFINE_string('name', None,
                     'Append a name Tag to run.')
