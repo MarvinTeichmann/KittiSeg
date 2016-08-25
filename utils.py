@@ -115,8 +115,9 @@ _set_cfg_value('step_show', 'TV_STEP_SHOW', 100, cfg)
 _set_cfg_value('step_eval', 'TV_STEP_EVAL', 100, cfg)
 _set_cfg_value('step_str',
                'TV_STEP_STR',
-               ('Step {step}/{total_steps}: loss = {loss_value:.2f} '
-                '( {sec_per_batch:.3f} sec (per Batch); '
+               ('Step {step}/{total_steps}: loss = {loss_value:.2f}'
+                'lr = {lr_value:.6f}'
+                '( {sec_per_batch:.3f} sec; '
                 '{examples_per_sec:.1f} examples/sec)'),
                cfg)
 

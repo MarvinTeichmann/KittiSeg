@@ -1,9 +1,10 @@
 {
   "model": {
-    "input_file": "model/inputs/kitti_seg_input.py",
-    "architecture_file" : "model/vgg/fcn8_vgg_fix.py",
-    "objective_file" : "model/segmentation/kitti_obj.py",
-    "optimizer_file" : "model/generic_optimizer.py"
+    "input_file": "../model/inputs/kitti_seg_input.py",
+    "architecture_file" : "../model/vgg/fcn8_vgg_fix.py",
+    "objective_file" : "../model/segmentation/kitti_obj.py",
+    "optimizer_file" : "../model/generic_optimizer.py",
+    "evaluator_file" : "../model/kitti_eval.py"
   },
   "path": ["../incl"],
 

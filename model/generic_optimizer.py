@@ -54,7 +54,7 @@ def training(hypes, loss, global_step, learning_rate):
     sol = hypes["solver"]
     hypes['tensors'] = {}
     hypes['tensors']['global_step'] = global_step
-    total_loss = loss
+    total_loss = loss['total_loss']
     with tf.name_scope('training'):
 
         if sol['opt'] == 'RMS':
@@ -69,7 +69,7 @@ def training(hypes, loss, global_step, learning_rate):
         else:
             raise ValueError('Unrecognized opt type')
 
-        grads_and_vars = opt.compute_gradients(loss)
+        grads_and_vars = opt.compute_gradients(total_loss)
 
         if hypes['clip_norm'] > 0:
             grads, tvars = zip(*grads_and_vars)

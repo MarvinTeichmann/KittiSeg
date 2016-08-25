@@ -6,8 +6,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import ipdb
-
 import os
 import numpy as np
 import scipy as scp
@@ -18,7 +16,19 @@ from seg_utils import seg_utils as seg
 import tensorflow as tf
 
 
-def decoder(hypes, logits):
+def _add_softmax(hypes, logits):
+    num_classes = hypes['arch']['num_classes']
+    with tf.name_scope('decoder'):
+        logits = tf.reshape(logits, (-1, num_classes))
+        epsilon = tf.constant(value=hypes['solver']['epsilon'])
+        logits = logits + epsilon
+
+        softmax = tf.nn.softmax(logits)
+
+    return softmax
+
+
+def decoder(hypes, logits, train):
     """Apply decoder to the logits.
 
     Args:
@@ -27,10 +37,13 @@ def decoder(hypes, logits):
     Return:
       logits: the logits are already decoded.
     """
-    return logits
+    decoded_logits = {}
+    decoded_logits['logits'] = logits
+    decoded_logits['softmax'] = _add_softmax(hypes, logits)
+    return decoded_logits
 
 
-def loss(hypes, logits, labels):
+def loss(hypes, decoded_logits, labels):
     """Calculate the loss from the logits and the labels.
 
     Args:
@@ -40,6 +53,7 @@ def loss(hypes, logits, labels):
     Returns:
       loss: Loss tensor of type float.
     """
+    logits = decoded_logits['logits']
     with tf.name_scope('loss'):
         logits = tf.reshape(logits, (-1, 2))
         shape = [logits.get_shape()[0], 2]
@@ -56,11 +70,17 @@ def loss(hypes, logits, labels):
                                             name='xentropy_mean')
         tf.add_to_collection('losses', cross_entropy_mean)
 
-        loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
-    return loss
+        total_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
+
+        losses = {}
+        losses['total_loss'] = total_loss
+        losses['xentropy'] = cross_entropy_mean
+        losses['weight_loss'] = total_loss - cross_entropy_mean
+
+    return losses
 
 
-def evaluation(hypes, logits, labels):
+def evaluation(hyp, images, labels, decoded_logits, losses, global_step):
     """Evaluate the quality of the logits at predicting the label.
 
     Args:
@@ -76,111 +96,26 @@ def evaluation(hypes, logits, labels):
     # It returns a bool tensor with shape [batch_size] that is true for
     # the examples where the label's is was in the top k (here k=1)
     # of all logits for that example.
-    return None
-    with tf.name_scope('eval'):
-        logits = tf.reshape(logits, (-1, 2))
-        labels = tf.reshape(labels, (-1, 2))
-
-        pred = tf.argmax(logits, dimension=1)
-
-        negativ = tf.to_int32(tf.equal(pred, 0))
-        tn = tf.reduce_sum(negativ*labels[:, 0])
-        fn = tf.reduce_sum(negativ*labels[:, 1])
-
-        positive = tf.to_int32(tf.equal(pred, 1))
-        tp = tf.reduce_sum(positive*labels[:, 1])
-        fp = tf.reduce_sum(positive*labels[:, 0])
-
-        eval_list = []
-
-        eval_list.append(('Accuracy', (tn+tp)/(tn + fn + tp + fp)))
-        eval_list.append(('Precision', tp/(tp + fp)))
-        eval_list.append(('True BG', tn/(tn + fp)))
-        eval_list.append(('True Street [Recall]', tp/(tp + fn)))
-
-        return eval_list
-
-
-def eval_image(hypes, gt_image, cnn_image):
-    """."""
-    thresh = np.array(range(0, 256))/255.0
-    road_gt = gt_image[:, :, 2] > 0
-    valid_gt = gt_image[:, :, 0] > 0
-
-    FN, FP, posNum, negNum = seg.evalExp(road_gt, cnn_image,
-                                         thresh, validMap=None,
-                                         validArea=valid_gt)
-
-    return FN, FP, posNum, negNum
-
-
-def evaluate(hypes, sess, image_pl, softmax):
-    data_dir = hypes['dirs']['data_dir']
-    data_file = hypes['data']['val_file']
-    data_file = os.path.join(data_dir, data_file)
-    image_dir = os.path.dirname(data_file)
-
-    thresh = np.array(range(0, 256))/255.0
-    total_fp = np.zeros(thresh.shape)
-    total_fn = np.zeros(thresh.shape)
-    total_posnum = 0
-    total_negnum = 0
-
-    image_list = []
-
-    with open(data_file) as file:
-        for i, datum in enumerate(file):
-                datum = datum.rstrip()
-                image_file, gt_file = datum.split(" ")
-                image_file = os.path.join(image_dir, image_file)
-                gt_file = os.path.join(image_dir, gt_file)
-
-                image = scp.misc.imread(image_file)
-
-                if hypes['jitter']['reseize_input']:
-                    image_height = hypes['jitter']['image_height']
-                    image_width = hypes['jitter']['image_width']
-                    input_image = scp.misc.imresize(
-                        image, size=(image_height, image_width),
-                        interp='bilinear')
-                else:
-                    input_image = image
-
-                shape = input_image.shape
-
-                gt_image = scp.misc.imread(gt_file)
-                feed_dict = {image_pl: input_image}
-
-                output = sess.run([softmax], feed_dict=feed_dict)
-                output_im = output[0][:, 1].reshape(shape[0], shape[1])
-
-                if hypes['jitter']['reseize_input']:
-                    gt_shape = gt_image.shape
-                    output_im = scp.misc.imresize(output_im,
-                                                  size=(gt_shape[0],
-                                                        gt_shape[1]),
-                                                  interp='bilinear')
-
-                if i % 5 == 0:
-                    ov_image = seg.make_overlay(image, output_im)
-                    name = os.path.basename(image_file)
-                    image_list.append((name, ov_image))
-
-                FN, FP, posNum, negNum = eval_image(hypes, gt_image, output_im)
-
-                total_fp += FP
-                total_fn += FN
-                total_posnum += posNum
-                total_negnum += negNum
-
-    eval_dict = seg.pxEval_maximizeFMeasure(total_posnum, total_negnum,
-                                            total_fn, total_fp,
-                                            thresh=thresh)
-
     eval_list = []
+    logits = tf.reshape(decoded_logits['logits'], (-1, 2))
+    labels = tf.reshape(labels, (-1, 2))
 
-    eval_list.append(('MaxF1', 100*eval_dict['MaxF']))
-    eval_list.append(('BestThresh', 100*eval_dict['BestThresh']))
-    eval_list.append(('Average Precision', 100*eval_dict['AvgPrec']))
+    pred = tf.argmax(logits, dimension=1)
 
-    return eval_list, image_list
+    negativ = tf.to_int32(tf.equal(pred, 0))
+    tn = tf.reduce_sum(negativ*labels[:, 0])
+    fn = tf.reduce_sum(negativ*labels[:, 1])
+
+    positive = tf.to_int32(tf.equal(pred, 1))
+    tp = tf.reduce_sum(positive*labels[:, 1])
+    fp = tf.reduce_sum(positive*labels[:, 0])
+
+    eval_list.append(('Acc. ', (tn+tp)/(tn + fn + tp + fp)))
+    eval_list.append(('xentropy', losses['xentropy']))
+    eval_list.append(('weight_loss', losses['weight_loss']))
+
+    # eval_list.append(('Precision', tp/(tp + fp)))
+    # eval_list.append(('True BG', tn/(tn + fp)))
+    # eval_list.append(('True Street [Recall]', tp/(tp + fn)))
+
+    return eval_list

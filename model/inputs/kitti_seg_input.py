@@ -197,10 +197,11 @@ def create_queues(hypes, phase):
     return q
 
 
-def start_enqueuing_threads(hypes, q, phase, sess, data_dir):
+def start_enqueuing_threads(hypes, q, phase, sess):
     """Start enqueuing threads."""
     image_pl = tf.placeholder(tf.float32)
     label_pl = tf.placeholder(tf.int32)
+    data_dir = hypes['dirs']['data_dir']
 
     def make_feed(data):
         image, label = data
@@ -303,7 +304,7 @@ def shuffle_join(tensor_list_list, capacity,
     return dequeued
 
 
-def inputs(hypes, q, phase, data_dir):
+def inputs(hypes, q, phase):
     """Generate Inputs images."""
     if phase == 'val':
         image, label = _read_processed_image(hypes, q, phase)
