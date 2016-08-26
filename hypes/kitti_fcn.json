@@ -1,10 +1,10 @@
 {
   "model": {
-    "input_file": "../model/inputs/kitti_seg_input.py",
-    "architecture_file" : "../model/vgg/fcn8_vgg_fix.py",
-    "objective_file" : "../model/segmentation/kitti_obj.py",
-    "optimizer_file" : "../model/generic_optimizer.py",
-    "evaluator_file" : "../model/kitti_eval.py"
+    "input_file": "../inputs/kitti_seg_input.py",
+    "architecture_file" : "../encoder/fcn8_vgg.py",
+    "objective_file" : "../decoder/kitti_obj.py",
+    "optimizer_file" : "../optimizer/generic_optimizer.py",
+    "evaluator_file" : "../evals/kitti_eval.py"
   },
   "path": ["../incl"],
 
@@ -29,22 +29,23 @@
     "upper_size": 1.7,
     "sig": 0.15,
     "res_chance": 0.4,
-    "random_crop": true,
+    "random_crop": false,
     "max_crop": 32,
     "crop_chance": 0.95,
-    "reseize_input": false,
-    "image_height" : 375,
-    "image_width" : 1242,
+    "fix_shape": true,
+    "image_height" : 384,
+    "image_width" : 1248,
 
     "augment_level": 0
 
   },
 
   "logging": {
-    "display_iter": 1,
-    "eval_iter": 5,
+    "display_iter": 20,
+    "eval_iter": 50,
+    "write_iter": 100,
     "save_iter": 2000,
-    "image_iter": 5
+    "image_iter": 10000
   },
 
   "solver": {
@@ -54,7 +55,7 @@
       "threads": 4,
       "learning_rate": 1e-5,
       "learning_rate_step": null,
-      "max_steps": 20000
+      "max_steps": 18000
   },
   "clip_norm" : 1.0
 }
