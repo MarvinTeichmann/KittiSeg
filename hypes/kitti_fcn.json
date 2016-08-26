@@ -41,19 +41,19 @@
   },
 
   "logging": {
-    "display_iter": 20,
-    "eval_iter": 50,
-    "write_iter": 100,
+    "display_iter": 50,
+    "eval_iter": 250,
+    "write_iter": 250,
     "save_iter": 2000,
     "image_iter": 10000
   },
 
   "solver": {
       "opt": "Adam",
-      "batch_size": 1,
+      "batch_size": 8,
       "epsilon": 0.00001,
       "threads": 4,
-      "learning_rate": 1e-5,
+      "learning_rate": 5e-5,
       "learning_rate_step": null,
       "max_steps": 18000
   },
