@@ -28,7 +28,9 @@ def eval_image(hypes, gt_image, cnn_image):
     return FN, FP, posNum, negNum
 
 
-def evaluate(hypes, sess, image_pl, softmax):
+def evaluate(hypes, sess, image_pl, inf_out):
+
+    softmax = inf_out['softmax']
     data_dir = hypes['dirs']['data_dir']
     data_file = hypes['data']['val_file']
     data_file = os.path.join(data_dir, data_file)

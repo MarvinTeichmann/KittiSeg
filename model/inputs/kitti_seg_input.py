@@ -212,7 +212,6 @@ def start_enqueuing_threads(hypes, q, phase, sess):
         for d in gen:
             sess.run(enqueue_op, feed_dict=make_feed(d))
 
-    threads = []
     enqueue_op = q.enqueue((image_pl, label_pl))
     gen = _make_data_gen(hypes, phase, data_dir)
     gen.next()
@@ -220,12 +219,13 @@ def start_enqueuing_threads(hypes, q, phase, sess):
     if phase == 'val':
         num_threads = 1
     else:
-        num_threads = hypes["solver"]["threads"]
+        num_threads = 1
     for i in range(num_threads):
-        threads.append(tf.train.threading.Thread(target=enqueue_loop,
-                                                 args=(sess, enqueue_op,
-                                                       phase, gen)))
-    threads[-1].start()
+        t = tf.train.threading.Thread(target=enqueue_loop,
+                                      args=(sess, enqueue_op,
+                                            phase, gen))
+        t.daemon = True
+        t.start()
 
 
 def _read_processed_image(hypes, q, phase):
