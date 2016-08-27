@@ -337,13 +337,14 @@ def inputs(hypes, q, phase):
     if not hypes['jitter']['fix_shape']:
         image, label = q.dequeue()
         nc = hypes["arch"]["num_classes"]
-        label.set_shape([1, None, None, nc])
+        label.set_shape([None, None, nc])
+        image.set_shape([None, None, 3])
         image = tf.expand_dims(image, 0)
         label = tf.expand_dims(label, 0)
     else:
         image, label = q.dequeue_many(hypes['solver']['batch_size'])
 
-    _processe_image(hypes, image)
+    image = _processe_image(hypes, image)
 
     # Display the training images in the visualizer.
     tensor_name = image.op.name
