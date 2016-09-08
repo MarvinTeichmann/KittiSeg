@@ -29,10 +29,10 @@
     "upper_size": 1.7,
     "sig": 0.15,
     "res_chance": 0.4,
-    "random_crop": false,
+    "random_crop": true,
     "max_crop": 32,
-    "crop_chance": 0.95,
-    "fix_shape": true,
+    "crop_chance": 0.8,
+    "fix_shape": false,
     "image_height" : 384,
     "image_width" : 1248,
 
@@ -50,10 +50,10 @@
 
   "solver": {
       "opt": "Adam",
-      "batch_size": 8,
+      "batch_size": 1,
       "epsilon": 0.00001,
       "threads": 4,
-      "learning_rate": 5e-5,
+      "learning_rate": 1e-5,
       "learning_rate_step": null,
       "max_steps": 18000
   },
