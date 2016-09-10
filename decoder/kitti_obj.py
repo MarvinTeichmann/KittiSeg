@@ -68,14 +68,13 @@ def loss(hypes, decoded_logits, labels):
 
         cross_entropy_mean = tf.reduce_mean(cross_entropy,
                                             name='xentropy_mean')
-        tf.add_to_collection('losses', cross_entropy_mean)
 
-        total_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
+        weight_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
 
         losses = {}
-        losses['total_loss'] = total_loss
+        losses['total_loss'] = weight_loss + cross_entropy_mean
         losses['xentropy'] = cross_entropy_mean
-        losses['weight_loss'] = total_loss - cross_entropy_mean
+        losses['weight_loss'] = weight_loss
 
     return losses
 

@@ -57,5 +57,6 @@
       "learning_rate_step": null,
       "max_steps": 18000
   },
-  "clip_norm" : 1.0
+  "clip_norm" : 1.0,
+  "wd": 5e-4
 }
