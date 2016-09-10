@@ -4,6 +4,8 @@ __pycache__/
 *$py.class
 *.npy
 
+sftp-config.json
+
 DATA/*
 output/*
 
