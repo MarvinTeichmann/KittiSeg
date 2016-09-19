@@ -55,8 +55,9 @@
       "threads": 4,
       "learning_rate": 1e-5,
       "learning_rate_step": null,
-      "max_steps": 18000
+      "max_steps": 12000
   },
+  "use_fc_wd": true,
   "loss": "xentropy",
   "clip_norm" : 1.0,
   "wd": 5e-4
