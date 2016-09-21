@@ -21,7 +21,7 @@ def _add_softmax(hypes, logits):
     with tf.name_scope('decoder'):
         logits = tf.reshape(logits, (-1, num_classes))
         epsilon = tf.constant(value=hypes['solver']['epsilon'])
-        logits = logits + epsilon
+        # logits = logits + epsilon
 
         softmax = tf.nn.softmax(logits)
 
@@ -58,7 +58,7 @@ def loss(hypes, decoded_logits, labels):
         logits = tf.reshape(logits, (-1, 2))
         shape = [logits.get_shape()[0], 2]
         epsilon = tf.constant(value=hypes['solver']['epsilon'])
-        logits = logits + epsilon
+        # logits = logits + epsilon
         labels = tf.to_float(tf.reshape(labels, (-1, 2)))
 
         softmax = tf.nn.softmax(logits)
