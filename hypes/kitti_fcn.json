@@ -2,7 +2,7 @@
   "model": {
     "input_file": "../inputs/kitti_seg_input.py",
     "architecture_file" : "../encoder/fcn8_vgg.py",
-    "objective_file" : "../decoder/kitti_obj.py",
+    "objective_file" : "../decoder/kitti_multiloss.py",
     "optimizer_file" : "../optimizer/generic_optimizer.py",
     "evaluator_file" : "../evals/kitti_eval.py"
   },
@@ -18,7 +18,7 @@
   "arch": {
     "num_classes" : 2,
     "image_size" : 50,
-    "weight": [1, 2],
+    "weight": [1, 1],
     "num_channels" : 3,
     "whitening": false
   },
@@ -55,8 +55,10 @@
       "threads": 4,
       "learning_rate": 1e-5,
       "learning_rate_step": null,
-      "max_steps": 18000
+      "max_steps": 12000
   },
+  "use_fc_wd": true,
+  "loss": "xentropy",
   "clip_norm" : 1.0,
   "wd": 5e-4
 }

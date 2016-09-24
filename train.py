@@ -39,7 +39,7 @@ flags.DEFINE_string('name', None,
 flags.DEFINE_string('project', None,
                     'Append a name Tag to run.')
 
-flags.DEFINE_string('hypes', 'hypes\kitti_fcn.json',
+flags.DEFINE_string('hypes', 'hypes/kitti_fcn.json',
                     'File storing model parameters.')
 
 if 'TV_SAVE' in os.environ and os.environ['TV_SAVE']:
