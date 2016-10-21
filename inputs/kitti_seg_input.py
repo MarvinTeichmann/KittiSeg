@@ -118,8 +118,16 @@ def jitter_input(hypes, image, gt_image):
     if jitter['fix_shape']:
         image_height = jitter['image_height']
         image_width = jitter['image_width']
+        assert not jitter['reseize_image']
+        image, gt_image = resize_label_image_with_pad(image, gt_image,
+                                                      image_height,
+                                                      image_width)
+    elif jitter['reseize_image']:
+        image_height = jitter['image_height']
+        image_width = jitter['image_width']
         image, gt_image = resize_label_image(image, gt_image,
-                                             image_height, image_width)
+                                             image_height,
+                                             image_width)
 
     assert(image.shape[:-1] == gt_image.shape[:-1])
     return image, gt_image
@@ -139,7 +147,7 @@ def random_crop(image, gt_image, max_crop):
     return image, gt_image
 
 
-def resize_label_image(image, label, image_height, image_width):
+def resize_label_image_with_pad(image, label, image_height, image_width):
     shape = image.shape
     assert(image_height >= shape[0])
     assert(image_width >= shape[1])
@@ -156,6 +164,19 @@ def resize_label_image(image, label, image_height, image_width):
     new_label[offset_x:offset_x+shape[0], offset_y:offset_y+shape[1]] = label
 
     return new_image, new_label
+
+
+def resize_label_image(image, gt_image, image_height, image_width):
+    image = scipy.misc.imresize(image, size=(image_height, image_width),
+                                interp='bilinear')
+    shape = gt_image.shape
+    gt_zero = np.zeros([shape[0], shape[1], 1])
+    gt_image = np.concatenate((gt_image, gt_zero), axis=2)
+    gt_image = scipy.misc.imresize(gt_image, size=(image_height, image_width),
+                                   interp='nearest')
+    gt_image = gt_image[:, :, 0:2]/255
+
+    return image, gt_image
 
 
 def random_resize(image, gt_image, lower_size, upper_size, sig):

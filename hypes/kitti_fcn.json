@@ -33,11 +33,11 @@
     "max_crop": 32,
     "crop_chance": 0.8,
     "fix_shape": false,
+    "reseize_image": false,
     "image_height" : 384,
     "image_width" : 1248,
 
     "augment_level": 0
-
   },
 
   "logging": {
@@ -45,7 +45,7 @@
     "eval_iter": 100,
     "write_iter": 100,
     "save_iter": 2000,
-    "image_iter": 10000
+    "image_iter": 20000
   },
 
   "solver": {
@@ -55,7 +55,7 @@
       "threads": 4,
       "learning_rate": 1e-5,
       "learning_rate_step": null,
-      "max_steps": 12000
+      "max_steps": 16000
   },
   "use_fc_wd": true,
   "loss": "xentropy",

@@ -29,6 +29,16 @@ def eval_image(hypes, gt_image, cnn_image):
     return FN, FP, posNum, negNum
 
 
+def resize_label_image(image, gt_image, image_height, image_width):
+    image = scp.misc.imresize(image, size=(image_height, image_width),
+                              interp='bilinear')
+    shape = gt_image.shape
+    gt_image = scp.misc.imresize(gt_image, size=(image_height, image_width),
+                                 interp='nearest')
+
+    return image, gt_image
+
+
 def evaluate(hypes, sess, image_pl, inf_out):
 
     softmax = inf_out['softmax']
@@ -53,6 +63,7 @@ def evaluate(hypes, sess, image_pl, inf_out):
                 gt_file = os.path.join(image_dir, gt_file)
 
                 image = scp.misc.imread(image_file)
+                gt_image = scp.misc.imread(gt_file)
 
                 if hypes['jitter']['fix_shape']:
                     shape = image.shape
@@ -67,12 +78,19 @@ def evaluate(hypes, sess, image_pl, inf_out):
                     new_image[offset_x:offset_x+shape[0],
                               offset_y:offset_y+shape[1]] = image
                     input_image = new_image
+                elif hypes['jitter']['reseize_image']:
+                    image_height = hypes['jitter']['image_height']
+                    image_width = hypes['jitter']['image_width']
+                    gt_image_old = gt_image
+                    image, gt_image = resize_label_image(image, gt_image,
+                                                         image_height,
+                                                         image_width)
+                    input_image = image
                 else:
                     input_image = image
 
                 shape = input_image.shape
 
-                gt_image = scp.misc.imread(gt_file)
                 feed_dict = {image_pl: input_image}
 
                 output = sess.run([softmax], feed_dict=feed_dict)
@@ -83,7 +101,7 @@ def evaluate(hypes, sess, image_pl, inf_out):
                     output_im = output_im[offset_x:offset_x+gt_shape[0],
                                           offset_y:offset_y+gt_shape[1]]
 
-                if i % 5 == 0:
+                if True:
                     ov_image = seg.make_overlay(image, output_im)
                     name = os.path.basename(image_file)
                     image_list.append((name, ov_image))
