@@ -20,8 +20,7 @@ def _add_softmax(hypes, logits):
     num_classes = hypes['arch']['num_classes']
     with tf.name_scope('decoder'):
         logits = tf.reshape(logits, (-1, num_classes))
-        epsilon = tf.constant(value=hypes['solver']['epsilon'])
-        logits = logits + epsilon
+        # logits = logits + epsilon
 
         softmax = tf.nn.softmax(logits)
 
@@ -57,8 +56,7 @@ def loss(hypes, decoded_logits, labels):
     with tf.name_scope('loss'):
         logits = tf.reshape(logits, (-1, 2))
         shape = [logits.get_shape()[0], 2]
-        epsilon = tf.constant(value=hypes['solver']['epsilon'])
-        logits = logits + epsilon
+        # logits = logits + epsilon
         labels = tf.to_float(tf.reshape(labels, (-1, 2)))
 
         softmax = tf.nn.softmax(logits)
@@ -69,10 +67,17 @@ def loss(hypes, decoded_logits, labels):
         cross_entropy_mean = tf.reduce_mean(cross_entropy,
                                             name='xentropy_mean')
 
-        weight_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
+        tf.add_to_collection('total_losses', cross_entropy_mean)
+
+        enc_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
+        dec_loss = tf.add_n(tf.get_collection('dec_losses'), name='total_loss')
+        weight_loss = enc_loss + dec_loss
+
+        total_loss = tf.add_n(tf.get_collection('total_losses'),
+                              name='total_loss') + weight_loss
 
         losses = {}
-        losses['total_loss'] = weight_loss + cross_entropy_mean
+        losses['total_loss'] = total_loss
         losses['xentropy'] = cross_entropy_mean
         losses['weight_loss'] = weight_loss
 

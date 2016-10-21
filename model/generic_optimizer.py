@@ -31,7 +31,7 @@ def get_learning_rate(hypes, step):
             return hypes['solver']['learning_rates'][i]
 
 
-def training(hypes, loss, global_step, learning_rate):
+def training(hypes, loss, global_step, learning_rate, opt=None):
     """Sets up the training Ops.
 
     Creates a summarizer to track the loss over time in TensorBoard.
@@ -57,19 +57,26 @@ def training(hypes, loss, global_step, learning_rate):
     total_loss = loss['total_loss']
     with tf.name_scope('training'):
 
-        if sol['opt'] == 'RMS':
-            opt = tf.train.RMSPropOptimizer(learning_rate=learning_rate,
-                                            decay=0.9, epsilon=sol['epsilon'])
-        elif sol['opt'] == 'Adam':
-            opt = tf.train.AdamOptimizer(learning_rate=learning_rate,
-                                         epsilon=sol['epsilon'])
-        elif sol['opt'] == 'SGD':
-            lr = learning_rate
-            opt = tf.train.GradientDescentOptimizer(learning_rate=lr)
-        else:
-            raise ValueError('Unrecognized opt type')
+        import ipdb
+        ipdb.set_trace()
+
+        if opt is not None:
+            if sol['opt'] == 'RMS':
+                opt = tf.train.RMSPropOptimizer(learning_rate=learning_rate,
+                                                decay=0.9,
+                                                epsilon=sol['epsilon'])
+            elif sol['opt'] == 'Adam':
+                opt = tf.train.AdamOptimizer(learning_rate=learning_rate,
+                                             epsilon=sol['epsilon'])
+            elif sol['opt'] == 'SGD':
+                lr = learning_rate
+                opt = tf.train.GradientDescentOptimizer(learning_rate=lr)
+            else:
+                raise ValueError('Unrecognized opt type')
 
         grads_and_vars = opt.compute_gradients(total_loss)
+
+        hypes['opt'] = opt
 
         if hypes['clip_norm'] > 0:
             grads, tvars = zip(*grads_and_vars)
