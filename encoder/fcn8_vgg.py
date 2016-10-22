@@ -6,6 +6,8 @@ from tensorflow_fcn import fcn8_vgg
 
 import tensorflow as tf
 
+import os
+
 
 def inference(hypes, images, train=True):
     """Build the MNIST model up to where it may be used for inference.
@@ -17,7 +19,8 @@ def inference(hypes, images, train=True):
     Returns:
       softmax_linear: Output tensor with the computed logits.
     """
-    vgg_fcn = fcn8_vgg.FCN8VGG()
+    vgg16_npy_path = os.path.join(hypes['dirs']['data_dir'], "vgg16.npy")
+    vgg_fcn = fcn8_vgg.FCN8VGG(vgg16_npy_path=vgg16_npy_path)
 
     vgg_fcn.wd = hypes['wd']
 
