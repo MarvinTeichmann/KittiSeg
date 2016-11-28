@@ -168,7 +168,7 @@ def resize_label_image_with_pad(image, label, image_height, image_width):
 
 def resize_label_image(image, gt_image, image_height, image_width):
     image = scipy.misc.imresize(image, size=(image_height, image_width),
-                                interp='bilinear')
+                                interp='cubic')
     shape = gt_image.shape
     gt_zero = np.zeros([shape[0], shape[1], 1])
     gt_image = np.concatenate((gt_image, gt_zero), axis=2)

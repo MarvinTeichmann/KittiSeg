@@ -31,7 +31,7 @@ def eval_image(hypes, gt_image, cnn_image):
 
 def resize_label_image(image, gt_image, image_height, image_width):
     image = scp.misc.imresize(image, size=(image_height, image_width),
-                              interp='bilinear')
+                              interp='cubic')
     shape = gt_image.shape
     gt_image = scp.misc.imresize(gt_image, size=(image_height, image_width),
                                  interp='nearest')
