@@ -1,0 +1,132 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""Get statistics about the distribution of classes in the masks."""
+
+import logging
+import sys
+import os
+import json
+import numpy as np
+
+logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.INFO,
+                    stream=sys.stdout)
+
+from tensorvision import utils
+from tensorvision import analyze
+
+
+# configure logging
+if 'TV_IS_DEV' in os.environ and os.environ['TV_IS_DEV']:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.INFO,
+                        stream=sys.stdout)
+else:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.INFO,
+                        stream=sys.stdout)
+
+
+def main(hypes_file):
+    """Orchestrate the analyzation of the data sets masks."""
+    hypes_base_path = os.path.dirname(os.path.realpath(hypes_file))
+    with open(hypes_file, 'r') as f:
+        hypes = json.load(f)
+
+    if 'data' not in hypes:
+        logging.error("%s does not have a 'data' entry.", hypes_file)
+        sys.exit(-1)
+    if 'train' in hypes['data']:
+        print("")
+        print("## Training data")
+        analyze_dataset(hypes, hypes_base_path, hypes['data']['train'])
+        print("")
+    if 'test' in hypes['data']:
+        print("## Testing data")
+        analyze_dataset(hypes, hypes_base_path, hypes['data']['test'])
+        print("")
+
+
+def analyze_dataset(hypes, hypes_base_path, dataset_file):
+    """Analyze a dataset."""
+    # Get list of files
+    if not os.path.isabs(dataset_file):
+        dataset_file = os.path.join(hypes_base_path, dataset_file)
+        dataset_file = os.path.realpath(dataset_file)
+    labeled_dataset = utils.load_labeled_files_json(dataset_file)
+    print("%i labeled files found." % len(labeled_dataset))
+
+    if 'classes' not in hypes:
+        logging.info("'classes' was not found in hypes file.")
+        colors = analyze.get_color_distribution(labeled_dataset)
+        # Output
+        rows = [['color', 'count', 'rel']]
+        total = sum([count for _, count in colors.items()])
+        for color, count in colors.items():
+            rows.append([str(color),
+                         str(count),
+                         "%0.4f" % (float(count) / total * 100.0)])
+        _pprinttable(rows)
+    else:
+        classes = analyze.get_class_distribution(hypes, labeled_dataset)
+        # Output
+        rows = [['class', 'count', 'rel']]
+        total = sum([count for _, count in classes.items()])
+        for cl, count in classes.items():
+            rows.append(["%s (%s)" % (
+                         str(cl), hypes['classes'][cl]['name']),
+                         str(count),
+                         "%0.2f" % (float(count) / total * 100.0)])
+        _pprinttable(rows)
+
+
+def _pprinttable(rows):
+    lengths = np.amax(np.array([[len(el) for el in row] for row in rows]),
+                      axis=0)
+    lengths = list(lengths)
+    formatstr = ("{0: <%i}\t{1: >%i}\t{2: >%i}%%" %
+                 (lengths[0], lengths[1], lengths[2]))
+    print(formatstr.format(*rows[0]))
+    print("-" * (sum(lengths) + len(lengths) * 2))
+    for row in rows[1:]:
+        print(formatstr.format(*row))
+
+
+def is_valid_file(parser, arg):
+    """
+    Check if arg is a valid file that already exists on the file system.
+
+    Parameters
+    ----------
+    parser : argparse object
+    arg : str
+
+    Returns
+    -------
+    arg
+    """
+    arg = os.path.abspath(arg)
+    if not os.path.exists(arg):
+        parser.error("The file %s does not exist!" % arg)
+    else:
+        return arg
+
+
+def get_parser():
+    """Get parser object for script xy.py."""
+    from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+    parser = ArgumentParser(description=__doc__,
+                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser.add_argument("--hypes",
+                        dest="hypes_file",
+                        type=lambda x: is_valid_file(parser, x),
+                        help="File storing model parameters.",
+                        metavar="FILE",
+                        required=True)
+    return parser
+
+
+if __name__ == "__main__":
+    args = get_parser().parse_args()
+    main(args.hypes_file)

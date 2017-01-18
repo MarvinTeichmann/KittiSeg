@@ -1,0 +1,65 @@
+{
+  "model": {
+    "input_file": "../inputs/kitti_seg_input.py",
+    "architecture_file" : "../encoder/fcn8_vgg.py",
+    "objective_file" : "../decoder/kitti_multiloss.py",
+    "optimizer_file" : "../optimizer/generic_optimizer.py",
+    "evaluator_file" : "../evals/kitti_eval.py"
+  },
+  "path": ["../incl"],
+
+  "data": {
+    "train_file" : "data_road/train3.txt",
+    "val_file" : "data_road/val3.txt",
+    "road_color" : [255,0,255],
+    "background_color" : [255,0,0]
+  },
+ 
+  "arch": {
+    "num_classes" : 2,
+    "image_size" : 50,
+    "weight": [1, 1],
+    "num_channels" : 3,
+    "whitening": false
+  },
+
+  "jitter": {
+    "random_resize": false,
+    "lower_size": 0.4,
+    "upper_size": 1.7,
+    "sig": 0.15,
+    "res_chance": 0.4,
+    "random_crop": true,
+    "max_crop": 32,
+    "crop_chance": 0.8,
+    "fix_shape": false,
+    "reseize_image": false,
+    "image_height" : 384,
+    "image_width" : 1248,
+
+    "augment_level": 0
+  },
+
+  "logging": {
+    "display_iter": 20,
+    "eval_iter": 100,
+    "write_iter": 100,
+    "save_iter": 2000,
+    "image_iter": 20000
+  },
+
+  "solver": {
+      "opt": "Adam",
+      "batch_size": 1,
+      "epsilon": 0.00001,
+      "adam_eps": 0.00001,
+      "threads": 4,
+      "learning_rate": 1e-5,
+      "learning_rate_step": null,
+      "max_steps": 12000
+  },
+  "use_fc_wd": true,
+  "loss": "xentropy",
+  "clip_norm" : 1.0,
+  "wd": 5e-4
+}

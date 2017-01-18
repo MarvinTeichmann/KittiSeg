@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Trains, evaluates and saves the MediSeg model."""
+"""Trains, evaluates and saves the KittiSeg model."""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -59,11 +59,11 @@ flags.DEFINE_string('name', None,
 flags.DEFINE_string('project', None,
                     'Append a name Tag to run.')
 
-flags.DEFINE_string('hypes', 'hypes/kitti_fcn.json',
+flags.DEFINE_string('hypes', 'hypes/KittiSeg.json',
                     'File storing model parameters.')
 
 flags.DEFINE_string('mod', None,
-                    'File storing model parameters.')
+                    'Modifier for model parameters.')
 
 if 'TV_SAVE' in os.environ and os.environ['TV_SAVE']:
     tf.app.flags.DEFINE_boolean(
@@ -80,6 +80,15 @@ else:
 def main(_):
     utils.set_gpus_to_use()
 
+    try:
+        import tensorvision.train
+        import tensorflow_fcn.utils
+    except ImportError:
+        logging.error("Could not import the submodules.")
+        logging.error("Please execute:"
+                      "'git submodule update --init --recursive'")
+        exit(1)
+
     with open(tf.app.flags.FLAGS.hypes, 'r') as f:
         logging.info("f: %s", f)
         hypes = json.load(f)
@@ -94,6 +103,12 @@ def main(_):
         os.environ['TV_DIR_RUNS'] = os.path.join(os.environ['TV_DIR_RUNS'],
                                                  'KittiSeg')
     utils.set_dirs(hypes, tf.app.flags.FLAGS.hypes)
+
+    if not os.path.exists(hypes['dirs']['data_dir']):
+        logging.error("Data dir: {} does not exist.".format(
+            hypes['dirs']['data_dir']))
+        logging.error("Have you executed 'python download_data.py' ?")
+        exit(1)
 
     utils._add_paths_to_sys(hypes)
 

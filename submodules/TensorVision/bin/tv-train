@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""Trains, evaluates and saves the model network using a queue."""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import logging
+import os
+import sys
+
+# configure logging
+if 'TV_IS_DEV' in os.environ and os.environ['TV_IS_DEV']:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.INFO,
+                        stream=sys.stdout)
+else:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.INFO,
+                        stream=sys.stdout)
+
+# https://github.com/tensorflow/tensorflow/issues/2034#issuecomment-220820070
+import numpy as np
+import tensorflow as tf
+
+flags = tf.app.flags
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string('name', None,
+                    'Append a name Tag to run.')
+
+flags.DEFINE_string('project', None,
+                    ('If set, run will be saved to',
+                        '`$TV_DIR_RUNS/project/run_name`.'))
+
+flags.DEFINE_string('hypes', None,
+                    'File storing model parameters.')
+
+if 'TV_SAVE' in os.environ and os.environ['TV_SAVE']:
+    tf.app.flags.DEFINE_boolean(
+        'save', True, ('Whether to save the run. In case --nosave (default) '
+                       'output will be saved to the folder TV_DIR_RUNS/debug, '
+                       'hence it will get overwritten by further runs.'))
+else:
+    tf.app.flags.DEFINE_boolean(
+        'save', False, ('Whether to save the run. In case --nosave (default) '
+                        'output will be saved to the folder TV_DIR_RUNS/debug '
+                        'hence it will get overwritten by further runs.'))
+
+
+# Do not remove; importing main is necessary for tf.app.run
+from tensorvision.train import main
+
+
+if __name__ == '__main__':
+    tf.app.run()

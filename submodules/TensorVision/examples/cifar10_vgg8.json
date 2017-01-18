@@ -1,0 +1,32 @@
+{
+  "model": {
+    "input_file": "inputs/cifar10_input.py",
+    "architecture_file" : "architectures/VGG8.py",
+    "objective_file" : "objectives/softmax_classifier.py",
+    "optimizer_file" : "optimizer/adam.py"
+  },
+
+  "data": {
+    "data_url" : "http://www.cs.toronto.edu/~kriz/cifar-10-binary.tar.gz",
+    "num_examples_per_epoch_for_train" : 50000,
+    "num_examples_per_epoch_for_eval" : 10000
+  },
+
+  "arch": {
+    "crop_size" : 32,
+    "num_classes" : 10,
+    "image_size" : 24,
+    "num_channels" : 3
+  },
+
+  "logging": {
+  },
+
+  "solver": {
+      "opt": null,
+      "batch_size": 128,
+      "epsilon": 0.00001,
+      "learning_rate": 1e-4,
+      "max_steps": 100000
+  }
+}

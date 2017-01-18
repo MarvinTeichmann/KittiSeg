@@ -1,0 +1,12 @@
+{
+  "classes": [
+    {"name": "croco",
+     "colors": ["#ff0000"],
+     "output": "#00ff007f"},
+    {"name": "background",
+     "colors": ["#0000ff"],
+     "output": "#ff00007f"},
+    {"name": "ignore",
+     "colors": ["default"]}
+  ]
+}

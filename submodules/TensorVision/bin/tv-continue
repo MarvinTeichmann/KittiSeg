@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+""" Continues training of a model from logdir."""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import logging
+import os
+import sys
+
+# configure logging
+if 'TV_IS_DEV' in os.environ and os.environ['TV_IS_DEV']:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.INFO,
+                        stream=sys.stdout)
+else:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.INFO,
+                        stream=sys.stdout)
+
+# https://github.com/tensorflow/tensorflow/issues/2034#issuecomment-220820070
+import numpy as np
+import tensorflow as tf
+
+import tensorvision.utils as utils
+import tensorvision.core as core
+import tensorvision.train as train
+
+flags = tf.app.flags
+FLAGS = flags.FLAGS
+
+flags.DEFINE_string('logdir', None,
+                    'Directory where logs are stored.')
+
+
+def main(_):
+    """Run main function for continue training."""
+    if FLAGS.logdir is None:
+        logging.error("No logdir is given.")
+        logging.error("Usage: tv-continue --logdir dir")
+        exit(1)
+
+    utils.set_gpus_to_use()
+    utils.load_plugins()
+
+    logging.info("Starting to analyze model in '%s'", FLAGS.logdir)
+    train.continue_training(FLAGS.logdir)
+
+
+if __name__ == '__main__':
+    tf.app.run()

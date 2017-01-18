@@ -28,6 +28,8 @@ from tensorflow.python.training import queue_runner
 from tensorflow.python.ops import data_flow_ops
 from tensorflow.python.framework import dtypes
 
+import threading
+
 
 logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
                     level=logging.INFO,
@@ -258,9 +260,9 @@ def start_enqueuing_threads(hypes, q, phase, sess):
     else:
         num_threads = 1
     for i in range(num_threads):
-        t = tf.train.threading.Thread(target=enqueue_loop,
-                                      args=(sess, enqueue_op,
-                                            phase, gen))
+        t = threading.Thread(target=enqueue_loop,
+                             args=(sess, enqueue_op,
+                                   phase, gen))
         t.daemon = True
         t.start()
 

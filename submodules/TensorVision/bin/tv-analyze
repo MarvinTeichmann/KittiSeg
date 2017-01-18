@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+"""Evaluates the model."""
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import logging
+import os
+import sys
+
+
+# configure logging
+if 'TV_IS_DEV' in os.environ and os.environ['TV_IS_DEV']:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.INFO,
+                        stream=sys.stdout)
+else:
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.INFO,
+                        stream=sys.stdout)
+
+# https://github.com/tensorflow/tensorflow/issues/2034#issuecomment-220820070
+import numpy as np
+import tensorflow as tf
+
+flags = tf.app.flags
+FLAGS = flags.FLAGS
+
+# Do not remove; importing main is necessary for tf.app.run
+from tensorvision.analyze import main
+
+
+if __name__ == '__main__':
+    tf.app.run()
