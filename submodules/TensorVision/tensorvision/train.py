@@ -121,7 +121,7 @@ def maybe_download_and_extract(hypes):
     f = os.path.join(hypes['dirs']['base_path'], hypes['model']['input_file'])
     data_input = imp.load_source("input", f)
     if hasattr(data_input, 'maybe_download_and_extract'):
-        data_input.maybe_download_and_extract(hypes, hypes['dirs']['data_dir'])
+        data_input.maybe_download_and_extract(hypes)
 
 
 def _write_eval_dict_to_summary(eval_dict, tag, summary_writer, global_step):

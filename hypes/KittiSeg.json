@@ -12,7 +12,9 @@
     "train_file" : "data_road/train3.txt",
     "val_file" : "data_road/val3.txt",
     "road_color" : [255,0,255],
-    "background_color" : [255,0,0]
+    "background_color" : [255,0,0],
+    "vgg_url": "https://dl.dropboxusercontent.com/u/50333326/vgg16.npy",
+    "kitti_url": ""
   },
  
   "arch": {

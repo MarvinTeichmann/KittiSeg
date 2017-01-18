@@ -19,6 +19,8 @@ import struct
 
 import tensorflow as tf
 
+from six.moves import urllib
+
 # Basic model parameters as external flags.
 flags = tf.app.flags
 FLAGS = flags.FLAGS
@@ -32,6 +34,25 @@ flags.DEFINE_string('gpus', None,
 def print_eval_dict(eval_dict, prefix=''):
     for name, value in eval_dict:
             logging.info('    %s %s : % 0.04f ' % (name, prefix, value))
+    return
+
+
+def download(url, dest_directory):
+    filename = url.split('/')[-1]
+    filepath = os.path.join(dest_directory, filename)
+
+    logging.info("Download URL: {}".format(url))
+    logging.info("Download DIR: {}".format(dest_directory))
+
+    def _progress(count, block_size, total_size):
+                prog = float(count * block_size) / float(total_size) * 100.0
+                sys.stdout.write('\r>> Downloading %s %.1f%%' %
+                                 (filename, prog))
+                sys.stdout.flush()
+
+    filepath, _ = urllib.request.urlretrieve(url, filepath,
+                                             reporthook=_progress)
+    print()
     return
 
 

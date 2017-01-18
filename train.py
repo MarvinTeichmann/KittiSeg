@@ -104,17 +104,11 @@ def main(_):
                                                  'KittiSeg')
     utils.set_dirs(hypes, tf.app.flags.FLAGS.hypes)
 
-    if not os.path.exists(hypes['dirs']['data_dir']):
-        logging.error("Data dir: {} does not exist.".format(
-            hypes['dirs']['data_dir']))
-        logging.error("Have you executed 'python download_data.py' ?")
-        exit(1)
-
     utils._add_paths_to_sys(hypes)
 
+    train.maybe_download_and_extract(hypes)
     logging.info("Initialize training folder")
     train.initialize_training_folder(hypes)
-    train.maybe_download_and_extract(hypes)
     logging.info("Start training")
     train.do_training(hypes)
 
