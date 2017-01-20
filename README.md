@@ -4,8 +4,6 @@ KittiSeg trains an FCN based model for Segmentation of Roads on the Kitti road d
 
 ![](https://i.imgur.com/Usi1XhE.png)
 
-Output of KittiSeg drawn as a green overlay.
-
 
 
 
