@@ -289,7 +289,7 @@ def create_queues(hypes, phase):
 
     capacity = 50
     q = tf.FIFOQueue(capacity=50, dtypes=dtypes, shapes=shapes)
-    tf.scalar_summary("queue/%s/fraction_of_%d_full" %
+    tf.summary.scalar("queue/%s/fraction_of_%d_full" %
                       (q.name + "_" + phase, capacity),
                       math_ops.cast(q.size(), tf.float32) * (1. / capacity))
 
@@ -388,7 +388,7 @@ def shuffle_join(tensor_list_list, capacity,
     summary_name = (
         "queue/%s/fraction_over_%d_of_%d_full" %
         (name + '_' + phase, min_ad, capacity - min_ad))
-    tf.scalar_summary(summary_name, full)
+    tf.summary.scalar(summary_name, full)
 
     dequeued = queue.dequeue(name='shuffel_deqeue')
     # dequeued = _deserialize_sparse_tensors(dequeued, sparse_info)
@@ -431,10 +431,10 @@ def inputs(hypes, q, phase):
 
     # Display the training images in the visualizer.
     tensor_name = image.op.name
-    tf.image_summary(tensor_name + '/image', image)
+    tf.summary.image(tensor_name + '/image', image)
 
     road = tf.expand_dims(tf.to_float(label[:, :, :, 0]), 3)
-    tf.image_summary(tensor_name + '/gt_image', road)
+    tf.summary.image(tensor_name + '/gt_image', road)
 
     return image, label
 
