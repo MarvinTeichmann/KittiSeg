@@ -72,6 +72,7 @@ def download(url, dest_directory):
     filepath, _ = urllib.request.urlretrieve(url, filepath,
                                              reporthook=_progress)
     print()
+    return filepath
 
 
 def main():

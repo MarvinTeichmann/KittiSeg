@@ -54,7 +54,7 @@ import tensorvision.train as train
 import tensorvision.analyze as ana
 import tensorvision.utils as utils
 
-flags.DEFINE_string('RUN', 'KittiSeg_trained',
+flags.DEFINE_string('RUN', 'KittiSeg_pretrained',
                     'Modifier for model parameters.')
 flags.DEFINE_string('hypes', 'hypes/KittiSeg.json',
                     'File storing model parameters.')
@@ -76,7 +76,25 @@ else:
                        'hence it will get overwritten by further runs.'))
 
 
-def maybe_download_and_extract():
+segmentation_weights_url = ("ftp://mi.eng.cam.ac.uk/"
+                            "pub/mttt2/models/KittiSeg_pretrained.zip")
+
+
+def maybe_download_and_extract(runs_dir):
+    logdir = os.path.join(runs_dir, FLAGS.RUN)
+
+    if os.path.exists(logdir):
+        # weights are downloaded. Nothing to do
+        return
+
+    if not FLAGS.RUN == 'KittiSeg_pretrained':
+        return
+
+    import zipfile
+    download_name = utils.download(segmentation_weights_url, runs_dir)
+
+    zipfile.ZipFile(download_name, 'r').extractall(runs_dir)
+
     return
 
 
@@ -97,7 +115,7 @@ def main(_):
         hypes = json.load(f)
     utils.load_plugins()
 
-    if False and 'TV_DIR_RUNS' in os.environ:
+    if 'TV_DIR_RUNS' in os.environ:
         runs_dir = os.path.join(os.environ['TV_DIR_RUNS'],
                                 'KittiSeg')
     else:
@@ -109,10 +127,15 @@ def main(_):
 
     train.maybe_download_and_extract(hypes)
 
-    maybe_download_and_extract()
+    maybe_download_and_extract(runs_dir)
     logging.info("Start Analysis")
     logdir = os.path.join(runs_dir, FLAGS.RUN)
     ana.do_analyze(logdir)
+
+    logging.info("Analysis for pretrained model complete.")
+    logging.info("For evaluating your own models I recommend using:"
+                 "`tv-analyze --logdir /path/to/run`.")
+    logging.info("tv-analysis has a much cleaner interface.")
 
 
 if __name__ == '__main__':
