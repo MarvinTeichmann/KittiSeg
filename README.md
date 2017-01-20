@@ -2,11 +2,22 @@
 
 KittiSeg trains an FCN based model for Segmentation of Roads on the Kitti road detection dataset. The model achieved [first place](http://www.cvlibs.net/datasets/kitti/eval_road_detail.php?result=ca96b8137feb7a636f3d774c408b1243d8a6e0df) on the Benchmark at submission time and is descripted in our paper: [MultiNet](https://arxiv.org/abs/1612.07695).
 
-## Feature overview
+![](https://i.imgur.com/Usi1XhE.png)
 
-The code contains the KittiSeg model as well as tools for `train`, `evaluate` and `visualize` semantic segmentation in tensorflow.
+Output of KittiSeg drawn as a green overlay.
 
-The model is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend. Easily organize your experiments.
+
+
+
+
+
+
+The model is optimized to perform well even with very few data samples avaible. The implementation is trained on just *250* images and receives a state-of-the art MaxF1 score of over *96%*. It's inference time is less then *95ms*.
+
+
+
+
+The code contains for `train`, `evaluate` and `visualize` semantic segmentation in tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way.
 
 ## Requirements
 
@@ -109,6 +120,3 @@ In addition the following TensorVision environoment Variables will be useful:
 `$TV_USE_GPUS`: specify default GPU behavour. 
 
 On a cluster it is useful to set `$TV_USE_GPUS=force`. This will make the flag `--gpus` manditory and ensure, that run will be executed on the right gpu.
-
-
-
