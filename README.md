@@ -24,7 +24,12 @@ Those modules can be installed using: `pip install numpy scipy pillow matplotlib
 1. Clone this repository: `git clone git@github.com:MarvinTeichmann/KittiSeg.git`
 2. Initialize all submodules: `git submodule update --init --recursive`
 3. Retrieve kitti data url here: `http://www.cvlibs.net/download.php?file=data_road.zip`
-4. Enter the retrieved url in the file`hypes/KittiSeg.json`. (line 17, `"kitti_url": ""`)
+4. Call `python download_data.py --kitti_url URL_YOU_RETRIEVED`
+
+I strongly recommand to exececute step 4. instead of downloading the data yourself. The script will also prepare the data to be in the right input format and check whether the right data is downloaded.
+
+
+
 
 ## Tutorial
 
@@ -104,3 +109,6 @@ In addition the following TensorVision environoment Variables will be useful:
 `$TV_USE_GPUS`: specify default GPU behavour. 
 
 On a cluster it is useful to set `$TV_USE_GPUS=force`. This will make the flag `--gpus` manditory and ensure, that run will be executed on the right gpu.
+
+
+
