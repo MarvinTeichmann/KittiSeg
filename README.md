@@ -2,9 +2,11 @@
 
 KittiSeg trains an FCN based model for Segmentation of Roads on the Kitti road detection dataset. The model achieved [first place](http://www.cvlibs.net/datasets/kitti/eval_road_detail.php?result=ca96b8137feb7a636f3d774c408b1243d8a6e0df) on the Benchmark at submission time and is descripted in our paper: [MultiNet](https://arxiv.org/abs/1612.07695).
 
-The model is optimized to perform well even with very few data samples avaible. The implementation is trained on just *250* images and receives a state-of-the art MaxF1 score of over *96%*. It's inference time is less then *95ms*.
-
 <img src="data_scripts/um_road_000032.png" width="288"> <img src="data_scripts/uu_road_000002.png" width="288"> <img src="data_scripts/uu_road_000049.png" width="288"> 
+
+<img src="data_scripts/um_road_000005.png" width="288"> <img src="data_scripts/umm_road_000059.png" width="288"> <img src="data_scripts/um_road_000041.png" width="288"> 
+
+The model is perform well on small datasets. The training is performed using just *250* images. Despite this a state-of-the art MaxF1 score of over *96%* is archieved. The model is useable for real-time applications. Inference can be performed at the impressive speed of *95ms* per image.
 
 The code contains for `train`, `evaluate` and `visualize` semantic segmentation in tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way.
 
