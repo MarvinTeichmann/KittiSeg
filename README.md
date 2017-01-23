@@ -6,9 +6,9 @@ KittiSeg performs segmentation of roads by utilizing an FCN based model. The mod
 
 <img src="data_scripts/um_road_000005.png" width="288"> <img src="data_scripts/umm_road_000059.png" width="288"> <img src="data_scripts/um_road_000041.png" width="288"> 
 
-The model is designed to perform well on small datasets. The training is done using just *250* densly labeled images. Despite this a state-of-the art MaxF1 score of over *96%* is archieved. The model is useable for real-time applications. Inference can be performed at the impressive speed of *95ms* per image.
+The model is designed to perform well on small datasets. The training is done using just *250* densely labelled images. Despite this a state-of-the art MaxF1 score of over *96%* is achieved. The model is usable for real-time application. Inference can be performed at the impressive speed of *95ms* per image.
 
-The code contains for `train`, `evaluate` and `visualize` semantic segmentation in tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way.
+The code contains for `train`, `evaluate` and `visualize` semantic segmentation in Tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way.
 
 ## Requirements
 
@@ -28,7 +28,7 @@ Those modules can be installed using: `pip install numpy scipy pillow matplotlib
 3. Retrieve kitti data url here: [http://www.cvlibs.net/download.php?file=data_road.zip](http://www.cvlibs.net/download.php?file=data_road.zip)
 4. Call `python download_data.py --kitti_url URL_YOU_RETRIEVED`
 
-I strongly recommand using the `download_data.py` script to download the data. The script will also extract and prepare the data directory. See also Section [Managing Folders](README.md#managing-folders) to control where the data is stored.
+I strongly recommend using the `download_data.py` script to download the data. The script will also extract and prepare the data directory. See also Section [Managing Folders](README.md#managing-folders) to control where the data is stored.
 
 
 ## Tutorial
@@ -64,7 +64,7 @@ Those modules operate independently. This allows easy experiments with different
 
 ## Managing Folders
 
-By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by adjusting the environoment Variabels: `$TV_DIR_DATA` and `$TV_DIR_RUNS`. 
+By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by adjusting the environment variables: `$TV_DIR_DATA` and `$TV_DIR_RUNS`. 
 
 For organizing your experiments you can use:
 `python train.py --project batch_size_bench --name size_5`. This will store the run in the subfolder:  `$TV_DIR_RUNS/batch_size_bench/size_5_%DATE`
@@ -74,7 +74,7 @@ This is useful if you want to run different series of experiments.
 
 ## Utilize TensorVision backend
 
-KittiSeg is build on top of the TensorVision [TensorVision](https://github.com/TensorVision/TensorVision) backend. TensorVision modulizes computer vision training and helps organizing experiments. 
+KittiSeg is build on top of the TensorVision [TensorVision](https://github.com/TensorVision/TensorVision) backend. TensorVision modularizes computer vision training and helps organizing experiments. 
 
 
 To utilize the entire TensorVision functionality install it using 
@@ -91,7 +91,7 @@ Now you can use the TensorVision command line tools, which includes:
 
 ## Useful Flags & Variabels
 
-Here are some Flags which will be useful when working with KittiSeg and TensorVision. All flags are avaible across all scripts. 
+Here are some Flags which will be useful when working with KittiSeg and TensorVision. All flags are available across all scripts. 
 
 `--hypes` : specify which hype-file to use <br>
 `--logdir` : specify which logdir to use <br>
@@ -100,10 +100,10 @@ Here are some Flags which will be useful when working with KittiSeg and TensorVi
 `--project` : assign a project to the run <br>
 `--nosave` : debug run, logdir will be set to `debug` <br>
 
-In addition the following TensorVision environoment Variables will be useful:
+In addition the following TensorVision environment Variables will be useful:
 
 `$TV_DIR_DATA`: specify meta directory for data <br>
-`$TV_DIR_RUNS`: specify meta directiry for output <br>
-`$TV_USE_GPUS`: specify default GPU behavour. <br>
+`$TV_DIR_RUNS`: specify meta directory for output <br>
+`$TV_USE_GPUS`: specify default GPU behaviour. <br>
 
-On a cluster it is useful to set `$TV_USE_GPUS=force`. This will make the flag `--gpus` manditory and ensure, that run will be executed on the right gpu.
+On a cluster it is useful to set `$TV_USE_GPUS=force`. This will make the flag `--gpus` mandatory and ensure, that run will be executed on the right GPU.
