@@ -1,12 +1,12 @@
 # KittiSeg
 
-KittiSeg trains an FCN based model for Segmentation of Roads on the Kitti road detection dataset. The model achieved [first place](http://www.cvlibs.net/datasets/kitti/eval_road_detail.php?result=ca96b8137feb7a636f3d774c408b1243d8a6e0df) on the Benchmark at submission time and is descripted in our paper: [MultiNet](https://arxiv.org/abs/1612.07695).
+KittiSeg performs segmentation of roads by utilizing an FCN based model. The model achieved [first place](http://www.cvlibs.net/datasets/kitti/eval_road_detail.php?result=ca96b8137feb7a636f3d774c408b1243d8a6e0df) on the Kitti Road Detection Benchmark at submission time and is descripted in our paper: [MultiNet](https://arxiv.org/abs/1612.07695).
 
 <img src="data_scripts/um_road_000032.png" width="288"> <img src="data_scripts/uu_road_000002.png" width="288"> <img src="data_scripts/uu_road_000049.png" width="288"> 
 
 <img src="data_scripts/um_road_000005.png" width="288"> <img src="data_scripts/umm_road_000059.png" width="288"> <img src="data_scripts/um_road_000041.png" width="288"> 
 
-The model is perform well on small datasets. The training is performed using just *250* images. Despite this a state-of-the art MaxF1 score of over *96%* is archieved. The model is useable for real-time applications. Inference can be performed at the impressive speed of *95ms* per image.
+The model is designed to perform well on small datasets. The training is done using just *250* densly labeled images. Despite this a state-of-the art MaxF1 score of over *96%* is archieved. The model is useable for real-time applications. Inference can be performed at the impressive speed of *95ms* per image.
 
 The code contains for `train`, `evaluate` and `visualize` semantic segmentation in tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way.
 
@@ -28,9 +28,7 @@ Those modules can be installed using: `pip install numpy scipy pillow matplotlib
 3. Retrieve kitti data url here: [http://www.cvlibs.net/download.php?file=data_road.zip](http://www.cvlibs.net/download.php?file=data_road.zip)
 4. Call `python download_data.py --kitti_url URL_YOU_RETRIEVED`
 
-I strongly recommand to exececute step 4. instead of downloading the data yourself. The script will also prepare the data to be in the right input format and check whether the right data is downloaded.
-
-
+I strongly recommand using the `download_data.py` script to download the data. The script will also extract and prepare the data directory. See also Section [Managing Folders](README.md#managing-folders) to control where the data is stored.
 
 
 ## Tutorial
@@ -66,7 +64,7 @@ Those modules operate independently. This allows easy experiments with different
 
 ## Managing Folders
 
-By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by adjusting the environoment Variabels: `$TV_DIR_DATA` and `$TV_DIR_RUNS`.
+By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by adjusting the environoment Variabels: `$TV_DIR_DATA` and `$TV_DIR_RUNS`. 
 
 For organizing your experiments you can use:
 `python train.py --project batch_size_bench --name size_5`. This will store the run in the subfolder:  `$TV_DIR_RUNS/batch_size_bench/size_5_%DATE`
