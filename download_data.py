@@ -131,8 +131,10 @@ def main():
 
     train_txt = "data_scripts/train3.txt"
     val_txt = "data_scripts/val3.txt"
+    testing_txt = "data_scripts/testing.txt"
     copy2(train_txt, kitti_road_dir)
     copy2(val_txt, kitti_road_dir)
+    copy2(testing_txt, kitti_road_dir)
 
     logging.info("All data have been downloaded successful.")
 

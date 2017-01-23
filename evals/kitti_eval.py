@@ -15,6 +15,9 @@ from seg_utils import seg_utils as seg
 import tensorflow as tf
 import time
 
+import tensorvision
+import tensorvision.utils as utils
+
 
 def eval_image(hypes, gt_image, cnn_image):
     """."""
@@ -102,9 +105,16 @@ def evaluate(hypes, sess, image_pl, inf_out):
                                           offset_y:offset_y+gt_shape[1]]
 
                 if True:
+                    # Saving RB Plot
                     ov_image = seg.make_overlay(image, output_im)
                     name = os.path.basename(image_file)
                     image_list.append((name, ov_image))
+
+                    name2 = name.split('.')[0] + '_green.png'
+
+                    hard = output_im > 0.5
+                    green_image = utils.fast_overlay(image, hard)
+                    image_list.append((name2, green_image))
 
                 FN, FP, posNum, negNum = eval_image(hypes, gt_image, output_im)
 

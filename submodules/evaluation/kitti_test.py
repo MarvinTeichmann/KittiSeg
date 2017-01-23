@@ -17,15 +17,16 @@ import sys
 import scipy as scp
 import scipy.misc
 
-import overlay_utils as overlay
 
+sys.path.insert(1, '../../incl')
 
 import tensorflow as tf
 
 import tensorvision.utils as utils
 import tensorvision.core as core
+import tensorvision.analyze as ana
 
-from kitti_devkit import seg_utils as seg
+from seg_utils import seg_utils as seg
 
 # configure logging
 if 'TV_IS_DEV' in os.environ and os.environ['TV_IS_DEV']:
@@ -40,9 +41,6 @@ else:
 flags = tf.app.flags
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string('logdir', None,
-                    'Directory where logs are stored.')
-
 test_file = 'data_road/testing.txt'
 
 
@@ -52,9 +50,24 @@ def create_test_output(hypes, sess, image_pl, softmax):
     image_dir = os.path.dirname(data_file)
 
     logdir = "test_images/"
-    logdir_ov = "test_images_ov/"
-    os.mkdir(logdir)
-    os.mkdir(logdir_ov)
+    logdir_rb = "test_images_rb/"
+    logdir_green = "test_images_green/"
+
+    logging.info("Images will be written to {}/test_images_{{green, rg}}"
+                 .format(logdir))
+
+    logdir = os.path.join(hypes['dirs']['output_dir'], logdir)
+    logdir_rb = os.path.join(hypes['dirs']['output_dir'], logdir_rb)
+    logdir_green = os.path.join(hypes['dirs']['output_dir'], logdir_green)
+
+    if not os.path.exists(logdir):
+        os.mkdir(logdir)
+
+    if not os.path.exists(logdir_rb):
+        os.mkdir(logdir_rb)
+
+    if not os.path.exists(logdir_green):
+        os.mkdir(logdir_green)
 
     image_list = []
 
@@ -67,18 +80,23 @@ def create_test_output(hypes, sess, image_pl, softmax):
 
                 feed_dict = {image_pl: image}
 
-                output = sess.run([softmax], feed_dict=feed_dict)
+                output = sess.run([softmax['softmax']], feed_dict=feed_dict)
                 output_im = output[0][:, 1].reshape(shape[0], shape[1])
 
                 ov_image = seg.make_overlay(image, output_im)
+                hard = output_im > 0.5
+                green_image = utils.fast_overlay(image, hard)
+
                 name = os.path.basename(image_file)
                 new_name = name.split('_')[0] + "_road_" + name.split('_')[1]
 
                 save_file = os.path.join(logdir, new_name)
                 logging.info("Writing file: %s", save_file)
                 scp.misc.imsave(save_file, output_im)
-                save_file = os.path.join(logdir_ov, new_name)
+                save_file = os.path.join(logdir_rb, new_name)
                 scp.misc.imsave(save_file, ov_image)
+                save_file = os.path.join(logdir_green, new_name)
+                scp.misc.imsave(save_file, green_image)
 
 
 def _create_input_placeholder():
@@ -101,7 +119,6 @@ def do_inference(logdir):
     """
     hypes = utils.load_hypes_from_logdir(logdir)
     modules = utils.load_modules_from_logdir(logdir)
-    data_input, arch, objective, solver = modules
 
     # Tell TensorFlow that the model will be built into the default Graph.
     with tf.Graph().as_default():
@@ -112,11 +129,10 @@ def do_inference(logdir):
             image_pl, label_pl = _create_input_placeholder()
             image = tf.expand_dims(image_pl, 0)
             softmax = core.build_inference_graph(hypes, modules,
-                                                 image=image,
-                                                 label=label_pl)
+                                                 image=image)
 
-        sess_coll = core.start_tv_session(hypes)
-        sess, saver, summary_op, summary_writer, coord, threads = sess_coll
+        sess = tf.Session()
+        saver = tf.train.Saver()
 
         core.load_weights(logdir, sess, saver)
 

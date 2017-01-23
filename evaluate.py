@@ -54,6 +54,8 @@ import tensorvision.train as train
 import tensorvision.analyze as ana
 import tensorvision.utils as utils
 
+from evaluation import kitti_test
+
 flags.DEFINE_string('RUN', 'KittiSeg_pretrained',
                     'Modifier for model parameters.')
 flags.DEFINE_string('hypes', 'hypes/KittiSeg.json',
@@ -128,9 +130,13 @@ def main(_):
     train.maybe_download_and_extract(hypes)
 
     maybe_download_and_extract(runs_dir)
-    logging.info("Start Analysis")
+    logging.info("Evaluating on Validation data.")
     logdir = os.path.join(runs_dir, FLAGS.RUN)
+    # logging.info("Output images will be saved to {}".format)
     ana.do_analyze(logdir)
+
+    logging.info("Creating output on test data.")
+    kitti_test.do_inference(logdir)
 
     logging.info("Analysis for pretrained model complete.")
     logging.info("For evaluating your own models I recommend using:"
