@@ -112,10 +112,12 @@ On a cluster it is useful to set `$TV_USE_GPUS=force`. This will make the flag `
 
 If you benefit from this code, please cite our paper:
 
+```
 @article{teichmann2016multinet,
   title={MultiNet: Real-time Joint Semantic Reasoning for Autonomous Driving},
   author={Teichmann, Marvin and Weber, Michael and Zoellner, Marius and Cipolla, Roberto and Urtasun, Raquel},
   journal={arXiv preprint arXiv:1612.07695},
   year={2016}
 }
+```
 
