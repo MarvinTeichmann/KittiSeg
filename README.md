@@ -107,3 +107,15 @@ In addition the following TensorVision environment Variables will be useful:
 `$TV_USE_GPUS`: specify default GPU behaviour. <br>
 
 On a cluster it is useful to set `$TV_USE_GPUS=force`. This will make the flag `--gpus` mandatory and ensure, that run will be executed on the right GPU.
+
+# Citation
+
+If you benefit from this code, please cite our paper:
+
+@article{teichmann2016multinet,
+  title={MultiNet: Real-time Joint Semantic Reasoning for Autonomous Driving},
+  author={Teichmann, Marvin and Weber, Michael and Zoellner, Marius and Cipolla, Roberto and Urtasun, Raquel},
+  journal={arXiv preprint arXiv:1612.07695},
+  year={2016}
+}
+
