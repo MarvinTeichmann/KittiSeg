@@ -21,14 +21,18 @@ The code requires Tensorflow 1.0 as well as the following python libraries:
 
 Those modules can be installed using: `pip install numpy scipy pillow matplotlib` or `pip install -r requirements.txt`.
 
-### Install Tensorflow 1.0rc
+### Tensorflow 1.0rc
 
-This code requires `Tensorflow Version >= 1.0rc` to run. There have been a few breaking changes recently. If you are currently running an older tensorflow version, I suggest creating a new `virtualenv` and install 1.0rc following the instructions [here](https://github.com/tensorflow/tensorflow/blob/r1.0/tensorflow/g3doc/get_started/os_setup.md).
+This code requires `Tensorflow Version >= 1.0rc` to run. There have been a few breaking changes recently. If you are currently running an older tensorflow version, I suggest creating a new `virtualenv` and install 1.0rc using:
 
-[e.g. For the Linux Version with GPU support run:
+```bash
+export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.0.0rc0-cp27-none-linux_x86_64.whl
+pip install --upgrade $TF_BINARY_URL
+```
 
-`export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.0.0rc0-cp27-none-linux_x86_64.whl
-pip install --upgrade $TF_BINARY_URL` ]
+Above code will install the linux version with gpu support. For other versions follow the instructions [here](https://github.com/tensorflow/tensorflow/blob/r1.0/tensorflow/g3doc/get_started/os_setup.md).
+
+
 
 ## Setup
 
