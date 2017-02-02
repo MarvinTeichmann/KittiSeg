@@ -21,6 +21,11 @@ The code requires Tensorflow 1.0 as well as the following python libraries:
 
 Those modules can be installed using: `pip install numpy scipy pillow matplotlib` or `pip install -r requirements.txt`.
 
+### Install Tensorflow 1.0rc
+
+This code requires `Tensorflow Version >= 1.0rc` to run. There have been a few breaking changes recently. If you are currently running an older tensorflow version, I suggest creating a new `virtualenv` and install 1.0. Instructions for installing tf1.0r using pip can be found [here](https://github.com/tensorflow/tensorflow/blob/r1.0/tensorflow/g3doc/get_started/os_setup.md).
+
+
 ## Setup
 
 1. Clone this repository: `git clone git@github.com:MarvinTeichmann/KittiSeg.git`
