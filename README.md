@@ -23,8 +23,7 @@ Those modules can be installed using: `pip install numpy scipy pillow matplotlib
 
 ### Install Tensorflow 1.0rc
 
-This code requires `Tensorflow Version >= 1.0rc` to run. There have been a few breaking changes recently. If you are currently running an older tensorflow version, I suggest creating a new `virtualenv` and install 1.0. Instructions for installing tf1.0r using pip can be found [here](https://github.com/tensorflow/tensorflow/blob/r1.0/tensorflow/g3doc/get_started/os_setup.md).
-
+This code requires `Tensorflow Version >= 1.0rc` to run. There have been a few breaking changes recently. If you are currently running an older tensorflow version, I suggest creating a new `virtualenv` and install 1.0rc following the instructions [here](https://github.com/tensorflow/tensorflow/blob/r1.0/tensorflow/g3doc/get_started/os_setup.md).
 
 ## Setup
 
