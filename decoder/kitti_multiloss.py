@@ -95,7 +95,7 @@ def loss(hypes, decoded_logits, labels):
 
 def _compute_cross_entropy_mean(hypes, labels, softmax):
     head = hypes['arch']['weight']
-    cross_entropy = -tf.reduce_sum(tf.mul(labels * tf.log(softmax), head),
+    cross_entropy = -tf.reduce_sum(tf.multiply(labels * tf.log(softmax), head),
                                    reduction_indices=[1])
 
     cross_entropy_mean = tf.reduce_mean(cross_entropy,
