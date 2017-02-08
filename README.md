@@ -38,19 +38,24 @@ Above commands will install the linux version with gpu support. For other versio
 
 1. Clone this repository: `git clone https://github.com/MarvinTeichmann/KittiSeg.git`
 2. Initialize all submodules: `git submodule update --init --recursive`
-3. Retrieve kitti data url here: [http://www.cvlibs.net/download.php?file=data_road.zip](http://www.cvlibs.net/download.php?file=data_road.zip)
-4. Call `python download_data.py --kitti_url URL_YOU_RETRIEVED`
-
-I strongly recommend using the `download_data.py` script to download the data. The script will also extract and prepare the data directory. See also Section [Managing Folders](README.md#managing-folders) to control where the data is stored.
+3. [Optional] Download Kitti Road Data 
+    1. Retrieve kitti data url here: [http://www.cvlibs.net/download.php?file=data_road.zip](http://www.cvlibs.net/download.php?file=data_road.zip)
+    2. Call `python download_data.py --kitti_url URL_YOU_RETRIEVED`
+    
+Running the model using `demo.py` does not require you to download kitti data (step 3). Step 3 is only required if you want to train your own model using `train.py` or bench a model agains the official evaluation score `evaluate.py`. Also note, that I recommend using `download_data.py` instead of downloading the data yourself. The script will also extract and prepare the data. See Section [Managing Folders](README.md#managing-folders) if you like to control where the data is stored.
 
 
 ## Tutorial
 
 ### Getting started
 
+Run: `python demo.py --input_image data/demo/demo.png` to obtain a prediction using [demo.png](data//demo/demo.png) as input.
+
 Run: `python evaluate.py` to evaluate a trained model. 
 
 Run: `python train.py` to train a new model on the Kitti Data.
+
+If you like to understand the code, I would recommend looking at [demo.py](demo.py) first. I have documented each step as  	thoroughly as possible in this file.
 
 ### Modifying Model & Train on your own data
 
