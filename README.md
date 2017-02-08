@@ -36,7 +36,7 @@ Above commands will install the linux version with gpu support. For other versio
 
 ## Setup
 
-1. Clone this repository: `git clone git@github.com:MarvinTeichmann/KittiSeg.git`
+1. Clone this repository: `git clone https://github.com/MarvinTeichmann/KittiSeg.git`
 2. Initialize all submodules: `git submodule update --init --recursive`
 3. Retrieve kitti data url here: [http://www.cvlibs.net/download.php?file=data_road.zip](http://www.cvlibs.net/download.php?file=data_road.zip)
 4. Call `python download_data.py --kitti_url URL_YOU_RETRIEVED`
