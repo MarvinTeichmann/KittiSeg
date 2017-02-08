@@ -2,9 +2,9 @@
 
 KittiSeg performs segmentation of roads by utilizing an FCN based model. The model achieved [first place](http://www.cvlibs.net/datasets/kitti/eval_road_detail.php?result=ca96b8137feb7a636f3d774c408b1243d8a6e0df) on the Kitti Road Detection Benchmark at submission time and is descripted in our paper: [MultiNet](https://arxiv.org/abs/1612.07695).
 
-<img src="data_scripts/um_road_000032.png" width="288"> <img src="data_scripts/uu_road_000002.png" width="288"> <img src="data_scripts/uu_road_000049.png" width="288"> 
+<img src="data/examples/um_road_000032.png" width="288"> <img src="data/examples/uu_road_000002.png" width="288"> <img src="data/examples/uu_road_000049.png" width="288"> 
 
-<img src="data_scripts/um_road_000005.png" width="288"> <img src="data_scripts/umm_road_000059.png" width="288"> <img src="data_scripts/um_road_000041.png" width="288"> 
+<img src="data/examples/um_road_000005.png" width="288"> <img src="data/examples/umm_road_000059.png" width="288"> <img src="data/examples/um_road_000041.png" width="288"> 
 
 The model is designed to perform well on small datasets. The training is done using just *250* densely labelled images. Despite this a state-of-the art MaxF1 score of over *96%* is achieved. The model is usable for real-time application. Inference can be performed at the impressive speed of *95ms* per image.
 
