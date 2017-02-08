@@ -61,7 +61,7 @@ def loss(hypes, decoded_logits, labels):
         # logits = logits + epsilon
         labels = tf.to_float(tf.reshape(labels, (-1, 2)))
 
-        softmax = tf.nn.softmax(logits)
+        softmax = tf.nn.softmax(logits) + epsilon
 
         weight_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
 

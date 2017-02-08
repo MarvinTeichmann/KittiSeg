@@ -13,34 +13,6 @@ import sys
 
 import collections
 
-
-def dict_merge(dct, merge_dct):
-    """ Recursive dict merge. Inspired by :meth:``dict.update()``, instead of
-    updating only top-level keys, dict_merge recurses down into dicts nested
-    to an arbitrary depth, updating keys. The ``merge_dct`` is merged into
-    ``dct``.
-    :param dct: dict onto which the merge is executed
-    :param merge_dct: dct merged into dct
-    :return: None
-    """
-    for k, v in merge_dct.iteritems():
-        if (k in dct and isinstance(dct[k], dict) and
-                isinstance(merge_dct[k], collections.Mapping)):
-            dict_merge(dct[k], merge_dct[k])
-        else:
-            dct[k] = merge_dct[k]
-
-
-# configure logging
-if 'TV_IS_DEV' in os.environ and os.environ['TV_IS_DEV']:
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                        level=logging.INFO,
-                        stream=sys.stdout)
-else:
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s',
-                        level=logging.INFO,
-                        stream=sys.stdout)
-
 # https://github.com/tensorflow/tensorflow/issues/2034#issuecomment-220820070
 import numpy as np
 import tensorflow as tf
@@ -94,6 +66,8 @@ def maybe_download_and_extract(runs_dir):
 
     import zipfile
     download_name = utils.download(segmentation_weights_url, runs_dir)
+
+    logging.info("Extracting KittiSeg_pretrained.zip")
 
     zipfile.ZipFile(download_name, 'r').extractall(runs_dir)
 
