@@ -129,9 +129,9 @@ def main():
 
     logging.info("Preparing kitti_road data.")
 
-    train_txt = "data_scripts/train3.txt"
-    val_txt = "data_scripts/val3.txt"
-    testing_txt = "data_scripts/testing.txt"
+    train_txt = "data/train3.txt"
+    val_txt = "data/val3.txt"
+    testing_txt = "data/testing.txt"
     copy2(train_txt, kitti_road_dir)
     copy2(val_txt, kitti_road_dir)
     copy2(testing_txt, kitti_road_dir)

@@ -13,6 +13,8 @@ DATA/*
 RUNS/*
 output/*
 
+.directory
+
 # C extensions
 *.so
 

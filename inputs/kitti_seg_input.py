@@ -83,8 +83,8 @@ def maybe_download_and_extract(hypes):
 
     logging.info("Preparing kitti_road data.")
 
-    train_txt = "data_scripts/train3.txt"
-    val_txt = "data_scripts/val3.txt"
+    train_txt = "data/train3.txt"
+    val_txt = "data/val3.txt"
     copy2(train_txt, kitti_road_dir)
     copy2(val_txt, kitti_road_dir)
 
