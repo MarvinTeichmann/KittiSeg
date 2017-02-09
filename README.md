@@ -88,7 +88,7 @@ Include  `export TV_DIR_DATA="/MY/LARGE/HDD/DATA"` in your `.profile` and the al
 
 For organizing multiple experiments the flags `--project` and `--name` are very helpful. 
 
-`python train.py --project batch_size_bench --name size_5` will store the output of the run to the subfolder:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_%DATE`.
+`python train.py --project batch_size_bench --name size_5` will save all training output to:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_KittiSeg_2017_02_08_13.12`.
 
 
 ## Utilize TensorVision backend
