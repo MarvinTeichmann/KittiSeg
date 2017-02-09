@@ -82,7 +82,11 @@ Those modules operate independently. This allows easy experiments with different
 
 ## Managing Folders
 
-By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by setting the bash environment variables: `$TV_DIR_DATA` and `$TV_DIR_RUNS`. If you include `export TV_DIR_RUNS="/large/data/space/USERNAME/RUNS"` in your `.profile` all your output will be saved to `/large/data/space/USERNAME/RUNS/KittiSeg`.
+By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by setting the bash environment variables: `$TV_DIR_DATA` and `$TV_DIR_RUNS`.
+
+Include  `export TV_DIR_DATA="/large/data/space/USERNAME/DATA"` in your `.profile` and the all data will be downloaded to `/large/data/space/USERNAME/DATA/data_road`.
+
+Include `export TV_DIR_RUNS="/large/data/space/USERNAME/RUNS"` in your `.profile` and all runs will be saved to `/large/data/space/USERNAME/RUNS/KittiSeg`
 
 For organizing your experiments you can use:
 `python train.py --project batch_size_bench --name size_5`. This will store the run in the subfolder:  `$TV_DIR_RUNS/batch_size_bench/size_5_%DATE`
