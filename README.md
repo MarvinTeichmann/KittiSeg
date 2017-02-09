@@ -86,7 +86,7 @@ By default, the data is stored in the folder `KittiSeg/DATA` and the output of r
 
 Include  `export TV_DIR_DATA="/MY/LARGE/HDD/DATA"` in your `.profile` and the all data will be downloaded to `/MY/LARGE/HDD/DATA/data_road`.
 
-Include `export TV_DIR_RUNS="/MY/LARGE/HDD/DATA/RUNS"` in your `.profile` and all runs will be saved to `/MY/LARGE/HDD/DATA/RUNS/KittiSeg`
+Include `export TV_DIR_RUNS="/MY/LARGE/HDD/RUNS"` in your `.profile` and all runs will be saved to `/MY/LARGE/HDD/RUNS/KittiSeg`
 
 For organizing your experiments you can use:
 `python train.py --project batch_size_bench --name size_5`. This will store the run in the subfolder:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_%DATE`
