@@ -89,7 +89,7 @@ Include  `export TV_DIR_DATA="/large/data/space/USERNAME/DATA"` in your `.profil
 Include `export TV_DIR_RUNS="/large/data/space/USERNAME/RUNS"` in your `.profile` and all runs will be saved to `/large/data/space/USERNAME/RUNS/KittiSeg`
 
 For organizing your experiments you can use:
-`python train.py --project batch_size_bench --name size_5`. This will store the run in the subfolder:  `$TV_DIR_RUNS/batch_size_bench/size_5_%DATE`
+`python train.py --project batch_size_bench --name size_5`. This will store the run in the subfolder:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_%DATE`
 
 This is useful if you want to run different series of experiments.
 
