@@ -6,6 +6,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import tensorflow as tf
+
 import json
 import logging
 import os
@@ -43,7 +45,7 @@ else:
 
 # https://github.com/tensorflow/tensorflow/issues/2034#issuecomment-220820070
 import numpy as np
-import tensorflow as tf
+
 
 flags = tf.app.flags
 FLAGS = flags.FLAGS

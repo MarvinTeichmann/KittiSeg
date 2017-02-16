@@ -22,10 +22,14 @@ import tensorvision.utils as utils
 def eval_image(hypes, gt_image, cnn_image):
     """."""
     thresh = np.array(range(0, 256))/255.0
-    road_gt = gt_image[:, :, 2] > 0
-    valid_gt = gt_image[:, :, 0] > 0
 
-    FN, FP, posNum, negNum = seg.evalExp(road_gt, cnn_image,
+    road_color = np.array(hypes['data']['road_color'])
+    background_color = np.array(hypes['data']['background_color'])
+    gt_road = np.all(gt_image == road_color, axis=2)
+    gt_bg = np.all(gt_image == background_color, axis=2)
+    valid_gt = gt_road + gt_bg
+
+    FN, FP, posNum, negNum = seg.evalExp(gt_road, cnn_image,
                                          thresh, validMap=None,
                                          validArea=valid_gt)
 
