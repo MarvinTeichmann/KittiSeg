@@ -57,11 +57,30 @@ Run: `python train.py` to train a new model on the Kitti Data.
 
 If you like to understand the code, I would recommend looking at [demo.py](demo.py) first. I have documented each step as  	thoroughly as possible in this file.
 
+
+### Manage Data Storage
+
+KittiSeg allows to separate data storage from code. This is very useful in many server environments. By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by setting the bash environment variables: `$TV_DIR_DATA` and `$TV_DIR_RUNS`.
+
+Include  `export TV_DIR_DATA="/MY/LARGE/HDD/DATA"` in your `.profile` and the all data will be downloaded to `/MY/LARGE/HDD/DATA/data_road`. Include `export TV_DIR_RUNS="/MY/LARGE/HDD/RUNS"` in your `.profile` and all runs will be saved to `/MY/LARGE/HDD/RUNS/KittiSeg`
+
+### RUNDIR and Experiment Organization
+
+KittiSeg helps you to organize large number of experiments. To do so the output of each run is stored in its own rundir. Each rundir contains:
+
+* `output.log` a copy of the training output which was printed to your screen
+* `tensorflow events` tensorboard can be run in rundir
+* `tensorflow checkpoints` the trained model can be loaded from rundir
+* `[dir] images` a folder containing example output images. `image_iter` controls how often the whole validation set is dumped
+* `[dir] model_files` A copy of all source code need to build the model. This can be very useful of you have many versions of the model.
+
+To keep track of all the experiments, you can give each rundir a unique name with the `--name` flag. The `--project` flag will store the run in a separate subfolder allowing to run different series of experiments. As an example, `python train.py --project batch_size_bench --name size_5` will use the following dir as rundir:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_KittiSeg_2017_02_08_13.12`.
+
+Use the flag `--nosave` if you do not want to save all output in an rundir. This is very useful for debugging, if you are not interested in the actual output and you do not want to spam your `rundir`. `--nosave` will use the folder `$TV_DIR_RUNS/debug` as output. So you can still few the rundir, but it will be overwritten by the next `--nosave` run.
+
 ### Modifying Model & Train on your own data
 
-The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file should be enough to train the model on your own data and adjust the architecture according to your needs. You can create a new file `hypes/my_hype.json` and train that architecture using:
-
-`python train.py --hypes hypes/my_hype.json`
+The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file should be enough to train the model on your own data and adjust the architecture according to your needs. A description of the expected input format can be found [here](inputs/inputs.md). I would advise to creat a new hype file `hypes/my_hype.json` for your input data and start trainining by running: `python train.py --hypes hypes/my_hype.json`
 
 
 
@@ -80,15 +99,7 @@ For advanced modifications, the code is controlled by 5 different modules, which
 Those modules operate independently. This allows easy experiments with different datasets (`input_file`), encoder networks (`architecture_file`), etc. Also see [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) for a specification of each of those files.
 
 
-## Managing Folders
 
-By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by setting the bash environment variables: `$TV_DIR_DATA` and `$TV_DIR_RUNS`.
-
-Include  `export TV_DIR_DATA="/MY/LARGE/HDD/DATA"` in your `.profile` and the all data will be downloaded to `/MY/LARGE/HDD/DATA/data_road`. Include `export TV_DIR_RUNS="/MY/LARGE/HDD/RUNS"` in your `.profile` and all runs will be saved to `/MY/LARGE/HDD/RUNS/KittiSeg`
-
-For organizing multiple experiments the flags `--project` and `--name` are very helpful. 
-
-`python train.py --project batch_size_bench --name size_5` will save all training output to:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_KittiSeg_2017_02_08_13.12`.
 
 
 ## Utilize TensorVision backend
