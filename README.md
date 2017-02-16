@@ -84,6 +84,8 @@ The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file s
 
 `python train.py --hypes hypes/my_hype.json`
 
+A more elaborate description of the input expected input format of your data can be found [here](inputs/inputs.md).
+
 
 
 For advanced modifications, the code is controlled by 5 different modules, which are specified in `hypes/KittiSeg.json`.
