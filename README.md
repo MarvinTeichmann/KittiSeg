@@ -80,11 +80,7 @@ Use the flag `--nosave` if you do not want to save all output in an rundir. This
 
 ### Modifying Model & Train on your own data
 
-The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file should be enough to train the model on your own data and adjust the architecture according to your needs. A description of the expected input format can be found [here](inputs/inputs.md).
-
-You can create a new file `hypes/my_hype.json` and train that architecture using:
-
-`python train.py --hypes hypes/my_hype.json`
+The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file should be enough to train the model on your own data and adjust the architecture according to your needs. A description of the expected input format can be found [here](inputs/inputs.md). I would advise to creat a new hype file `hypes/my_hype.json` for your input data and start trainining by running: `python train.py --hypes hypes/my_hype.json`
 
 
 
