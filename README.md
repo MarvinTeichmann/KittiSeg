@@ -60,7 +60,7 @@ If you like to understand the code, I would recommend looking at [demo.py](demo.
 
 ### Manage Data Storage
 
-KittiSeg allows to seperate data storage from code. This is very useful in many server environoments. By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by setting the bash environment variables: `$TV_DIR_DATA` and `$TV_DIR_RUNS`.
+KittiSeg allows to separate data storage from code. This is very useful in many server environments. By default, the data is stored in the folder `KittiSeg/DATA` and the output of runs in `KittiSeg/RUNS`. This behaviour can be changed by setting the bash environment variables: `$TV_DIR_DATA` and `$TV_DIR_RUNS`.
 
 Include  `export TV_DIR_DATA="/MY/LARGE/HDD/DATA"` in your `.profile` and the all data will be downloaded to `/MY/LARGE/HDD/DATA/data_road`. Include `export TV_DIR_RUNS="/MY/LARGE/HDD/RUNS"` in your `.profile` and all runs will be saved to `/MY/LARGE/HDD/RUNS/KittiSeg`
 
@@ -71,10 +71,10 @@ KittiSeg helps you to organize large number of experiments. To do so the output 
 * `output.log` a copy of the training output which was printed to your screen
 * `tensorflow events` tensorboard can be run in rundir
 * `tensorflow checkpoints` the trained model can be loaded from rundir
-* `[dir] images` a folder containing example output images. `image_iter` controlls how often the whole validation set is dumped
+* `[dir] images` a folder containing example output images. `image_iter` controls how often the whole validation set is dumped
 * `[dir] model_files` A copy of all source code need to build the model. This can be very useful of you have many versions of the model.
 
-To keep track of all the experiments, you can give each rundir a unique name with the `--name` flag. The `--project` flag will store the run in a seperate subfolder allowing to run different series of experiments. As an example, `python train.py --project batch_size_bench --name size_5` will use the following dir as rundir:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_KittiSeg_2017_02_08_13.12`.
+To keep track of all the experiments, you can give each rundir a unique name with the `--name` flag. The `--project` flag will store the run in a separate subfolder allowing to run different series of experiments. As an example, `python train.py --project batch_size_bench --name size_5` will use the following dir as rundir:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_KittiSeg_2017_02_08_13.12`.
 
 Use the flag `--nosave` if you do not want to save all output in an rundir. This is very useful for debugging, if you are not interested in the actual output and you do not want to spam your `rundir`. `--nosave` will use the folder `$TV_DIR_RUNS/debug` as output. So you can still few the rundir, but it will be overwritten by the next `--nosave` run.
 
