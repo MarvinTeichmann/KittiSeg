@@ -127,7 +127,7 @@ On a cluster it is useful to set `$TV_USE_GPUS=force`. This will make the flag `
 
 ## Questions?
 
-Please have a look into the [FAQ](docu/FAQ.md). Also feel free to open an issue to discuss additional questions. Your question might make it into the FAQ as wel ;).
+Please have a look into the [FAQ](docu/FAQ.md). Also feel free to open an issue to discuss any questions not covered so far. 
 
 # Citation
 
