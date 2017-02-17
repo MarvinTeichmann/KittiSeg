@@ -6,7 +6,7 @@ Have a look at [inputs.md](inputs.md) and this [issue](https://github.com/Marvin
 
 Also, once you figured out how to make it work, feel free to add some lines of explanation to [inputs.md](inputs.md). As owner of this code, it is not easy get an idea of which conceptual aspects needs more explanation. 
 
-### I would like to train on RGB data, is this possible?
+### I would like to train on greyscale images, is this possible?
 
 Yes, since commit f7fdb24, all images will be converted to RGB upon load. Greyscale is those supported out-of-the box. This means, that even for greyscale data each pixel will be represented by a tripel. This is important when specifying the input format in [your hype file](../hypes/KittiSeg.json). Black will be stored as [0,0,0], white [255,255,255] and some light grey can be [200, 200, 200].
 
