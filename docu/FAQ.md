@@ -1,12 +1,14 @@
 # FAQ
 
-### I have issues loading my own data.
+### How can I use KittiSeg on my own data?
 
-Have a look at [inputs.md](inputs.md) and this [issue](https://github.com/MarvinTeichmann/KittiSeg/issues/8). Feel free to comment on the issue, if you have any question. Also feel free to add some lines in the docu in [inputs.md](inputs.md) and this [issue](https://github.com/MarvinTeichmann/KittiSeg/issues/8) if you think it needs more explanations. As owner of this code, it is not easy to understand what is obvious and which parts might need additional documentation.
+Have a look at [inputs.md](inputs.md) and this [issue](https://github.com/MarvinTeichmann/KittiSeg/issues/8). Feel free to open a further issue or comment on [issue 8](https://github.com/MarvinTeichmann/KittiSeg/issues/8) if your question is not covered so far. 
+
+Also, once you figured out how to make it work, feel free to add some lines of explanation to [inputs.md](inputs.md). As owner of this code, it is not easy get an idea of which conceptual aspects needs more explanation. 
 
 ### I would like to train on RGB data, is this possible?
 
-Yes, since commit f7fdb24, all images will be converted to RGB upon load. Greyscale is those supported out-of-the box. This means, that even for greyscale data each pixel will be represented by a tripel. This is important when specifing the input format in [your hype file](hypes/KittiSeg.json). Black will be stored as [0,0,0], white [255,255,255] and some light grey can be [200, 200, 200].
+Yes, since commit f7fdb24, all images will be converted to RGB upon load. Greyscale is those supported out-of-the box. This means, that even for greyscale data each pixel will be represented by a tripel. This is important when specifying the input format in [your hype file](../hypes/KittiSeg.json). Black will be stored as [0,0,0], white [255,255,255] and some light grey can be [200, 200, 200].
 
 ### Can I use your code to train segmentation with more then two classes
 
