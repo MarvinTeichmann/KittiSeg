@@ -12,7 +12,7 @@ The code contains for `train`, `evaluate` and `visualize` semantic segmentation 
 
 ## Requirements
 
-The code requires Tensorflow 1.0 as well as the following python libraries: 
+The code requires [Tensorflow 1.0](https://www.tensorflow.org/api_docs/) as well as the following python libraries: 
 
 * matplotlib
 * numpy
@@ -20,18 +20,6 @@ The code requires Tensorflow 1.0 as well as the following python libraries:
 * scipy
 
 Those modules can be installed using: `pip install numpy scipy pillow matplotlib` or `pip install -r requirements.txt`.
-
-### Tensorflow 1.0rc
-
-This code requires `Tensorflow Version >= 1.0rc` to run. There have been a few breaking changes recently. If you are currently running an older tensorflow version, I suggest creating a new `virtualenv` and install 1.0rc using:
-
-```bash
-export TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow_gpu-1.0.0rc0-cp27-none-linux_x86_64.whl
-pip install --upgrade $TF_BINARY_URL
-```
-
-Above commands will install the linux version with gpu support. For other versions follow the instructions [here](https://www.tensorflow.org/versions/r1.0/get_started/os_setup).
-
 
 
 ## Setup
