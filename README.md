@@ -8,7 +8,7 @@ KittiSeg performs segmentation of roads by utilizing an FCN based model. The mod
 
 The model is designed to perform well on small datasets. The training is done using just *250* densely labelled images. Despite this a state-of-the art MaxF1 score of over *96%* is achieved. The model is usable for real-time application. Inference can be performed at the impressive speed of *95ms* per image.
 
-The code contains for `train`, `evaluate` and `visualize` semantic segmentation in Tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way. Also check out [KittiBox](https://github.com/MarvinTeichmann/KittiBox#kittibox), and [KittiClass](https://github.com/MarvinTeichmann/KittiClass), similar projects implementing state-of-the art Detection and Classification approachs.
+The repository contains code for training, evaluating and visualizing semantic segmentation in Tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way. Also check out [KittiBox](https://github.com/MarvinTeichmann/KittiBox#kittibox), and [KittiClass](https://github.com/MarvinTeichmann/KittiClass), similar projects implementing state-of-the art Detection and Classification approachs.
 
 ## Requirements
 
@@ -63,7 +63,7 @@ KittiSeg helps you to organize large number of experiments. To do so the output 
 
 To keep track of all the experiments, you can give each rundir a unique name with the `--name` flag. The `--project` flag will store the run in a separate subfolder allowing to run different series of experiments. As an example, `python train.py --project batch_size_bench --name size_5` will use the following dir as rundir:  `$TV_DIR_RUNS/KittiSeg/batch_size_bench/size_5_KittiSeg_2017_02_08_13.12`.
 
-Use the flag `--nosave` if you do not want to save all output in an rundir. This is very useful for debugging, if you are not interested in the actual output and you do not want to spam your `rundir`. `--nosave` will use the folder `$TV_DIR_RUNS/debug` as output. So you can still few the rundir, but it will be overwritten by the next `--nosave` run.
+The flag `--nosave` is very useful to not spam your rundir.
 
 ### Modifying Model & Train on your own data
 
@@ -101,8 +101,8 @@ To utilize the entire TensorVision functionality install it using
 Now you can use the TensorVision command line tools, which includes:
 
 `tv-train --hypes hypes/KittiSeg.json` trains a json model. <br>
-`tv-continue --logdir PATH/TO/RUNDIR` continues interrupted training <br>
-`tv-analyze --logdir PATH/TO/RUNDIR` evaluated trained model <br>
+`tv-continue --logdir PATH/TO/RUNDIR` trains the model in RUNDIR, starting from the last saved checkpoint. Can be used for fine tuning by increasing `max_steps` in `model_files/hypes.json` .<br>
+`tv-analyze --logdir PATH/TO/RUNDIR` evaluates the model in RUNDIR <br>
 
 
 ## Useful Flags & Variabels
