@@ -8,7 +8,7 @@ KittiSeg performs segmentation of roads by utilizing an FCN based model. The mod
 
 The model is designed to perform well on small datasets. The training is done using just *250* densely labelled images. Despite this a state-of-the art MaxF1 score of over *96%* is achieved. The model is usable for real-time application. Inference can be performed at the impressive speed of *95ms* per image.
 
-The repository contains code for training, evaluating and visualizing semantic segmentation in Tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way. Also check out [KittiBox](https://github.com/MarvinTeichmann/KittiBox#kittibox) and [KittiClass](https://github.com/MarvinTeichmann/KittiClass), similar projects state-of-the art detection and classification.
+The repository contains code for training, evaluating and visualizing semantic segmentation in TensorFlow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) back end which allows to organize experiments in a very clean way. Also check out [KittiBox](https://github.com/MarvinTeichmann/KittiBox#kittibox) and [KittiClass](https://github.com/MarvinTeichmann/KittiClass), similar projects state-of-the art detection and classification.
 
 ## Requirements
 
