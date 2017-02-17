@@ -6,8 +6,9 @@ __pycache__/
 
 sftp-config.json
 
-run.sh
-run2.sh
+run*.sh
+demo*.sh
+.nfs*
 
 DATA/*
 RUNS/*
