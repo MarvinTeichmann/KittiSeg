@@ -12,7 +12,7 @@ The code contains for `train`, `evaluate` and `visualize` semantic segmentation 
 
 ## Requirements
 
-The code requires [Tensorflow 1.0](https://www.tensorflow.org/api_docs/) as well as the following python libraries: 
+The code requires [Tensorflow 1.0](https://www.tensorflow.org/install/) as well as the following python libraries: 
 
 * matplotlib
 * numpy
@@ -30,8 +30,7 @@ Those modules can be installed using: `pip install numpy scipy pillow matplotlib
     1. Retrieve kitti data url here: [http://www.cvlibs.net/download.php?file=data_road.zip](http://www.cvlibs.net/download.php?file=data_road.zip)
     2. Call `python download_data.py --kitti_url URL_YOU_RETRIEVED`
     
-Running the model using `demo.py` does not require you to download kitti data (step 3). Step 3 is only required if you want to train your own model using `train.py` or bench a model agains the official evaluation score `evaluate.py`. Also note, that I recommend using `download_data.py` instead of downloading the data yourself. The script will also extract and prepare the data. See Section [Managing Folders](README.md#managing-folders) if you like to control where the data is stored.
-
+Running the model using `demo.py` does not require you to download kitti data (step 3). Step 3 is only required if you want to train your own model using `train.py` or bench a model agains the official evaluation score `evaluate.py`. Also note, that I recommend using `download_data.py` instead of downloading the data yourself. The script will also extract and prepare the data. See Section [Manage data storage](README.md#manage-data-storage) if you like to control where the data is stored.
 
 ## Tutorial
 
