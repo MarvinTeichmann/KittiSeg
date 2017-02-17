@@ -8,7 +8,7 @@ KittiSeg performs segmentation of roads by utilizing an FCN based model. The mod
 
 The model is designed to perform well on small datasets. The training is done using just *250* densely labelled images. Despite this a state-of-the art MaxF1 score of over *96%* is achieved. The model is usable for real-time application. Inference can be performed at the impressive speed of *95ms* per image.
 
-The code contains for `train`, `evaluate` and `visualize` semantic segmentation in Tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way. Also check out [KittiBox](https://github.com/MarvinTeichmann/KittiBox#kittibox), a similar project implementing a state-of-the art Car detection approach.
+The code contains for `train`, `evaluate` and `visualize` semantic segmentation in Tensorflow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) backend which allows to organize experiments in a very clean way. Also check out [KittiBox](https://github.com/MarvinTeichmann/KittiBox#kittibox), and [KittiClass](https://github.com/MarvinTeichmann/KittiClass), similar projects implementing state-of-the art Detection and Classification approachs.
 
 ## Requirements
 
@@ -40,7 +40,7 @@ Run: `python demo.py --input_image data/demo/demo.png` to obtain a prediction us
 
 Run: `python evaluate.py` to evaluate a trained model. 
 
-Run: `python train.py` to train a new model on the Kitti Data.
+Run: `python train.py --hypes hypes/KittiSeg.json` to train a model using Kitti Data.
 
 If you like to understand the code, I would recommend looking at [demo.py](demo.py) first. I have documented each step as  	thoroughly as possible in this file.
 
@@ -67,8 +67,7 @@ Use the flag `--nosave` if you do not want to save all output in an rundir. This
 
 ### Modifying Model & Train on your own data
 
-The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file should be enough to train the model on your own data and adjust the architecture according to your needs. A description of the expected input format can be found [here](docu/inputs.md). I would advise to creat a new hype file `hypes/my_hype.json` for your input data and start trainining by running: `python train.py --hypes hypes/my_hype.json`
-
+The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file should be enough to train the model on your own data and adjust the architecture according to your needs. A description of the expected input format can be found [here](docu/inputs.md).
 
 
 For advanced modifications, the code is controlled by 5 different modules, which are specified in `hypes/KittiSeg.json`.
