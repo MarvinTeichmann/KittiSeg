@@ -80,7 +80,7 @@ Use the flag `--nosave` if you do not want to save all output in an rundir. This
 
 ### Modifying Model & Train on your own data
 
-The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file should be enough to train the model on your own data and adjust the architecture according to your needs. A description of the expected input format can be found [here](inputs/inputs.md). I would advise to creat a new hype file `hypes/my_hype.json` for your input data and start trainining by running: `python train.py --hypes hypes/my_hype.json`
+The model is controlled by the file `hypes/KittiSeg.json`. Modifying this file should be enough to train the model on your own data and adjust the architecture according to your needs. A description of the expected input format can be found [here](docu/inputs.md). I would advise to creat a new hype file `hypes/my_hype.json` for your input data and start trainining by running: `python train.py --hypes hypes/my_hype.json`
 
 
 
@@ -137,6 +137,10 @@ In addition the following TensorVision environment Variables will be useful:
 `$TV_USE_GPUS`: specify default GPU behaviour. <br>
 
 On a cluster it is useful to set `$TV_USE_GPUS=force`. This will make the flag `--gpus` mandatory and ensure, that run will be executed on the right GPU.
+
+## Questions?
+
+Please have a look into the [FAQ](docu/FAQ.md). Also feel free to open an issue to discuss additional questions. Your question might make it into the FAQ as wel ;).
 
 # Citation
 
