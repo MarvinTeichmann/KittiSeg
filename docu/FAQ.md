@@ -10,19 +10,11 @@ Also, once you figured out how to make it work, feel free to add some lines of e
 
 Yes, since commit f7fdb24, all images will be converted to RGB upon load. Greyscale is those supported out-of-the box. This means, that even for greyscale data each pixel will be represented by a tripel. This is important when specifying the input format in [your hype file](../hypes/KittiSeg.json). Black will be stored as [0,0,0], white [255,255,255] and some light grey can be [200, 200, 200].
 
-### Can I use your code to train segmentation with more then two classes
+### Can I use KittiSeg for multi-class segmentation?
 
-Yes, I had an earlier version run on Cityscapes data. This code is not compatible with the current TensorFlow and TensorVision version and I did not find the time to port it, yet.
+Yes, I had an earlier version run on Cityscapes data. Unfortunatly, my Cityscapes code is not compatible with the current TensorFlow and TensorVision version anymore and I did not find the time to port it, yet.
 
-However making this run is not to much of an afford. You will need to adapt `_make_data_gen` in the [input_producer](../inputs/kitti_seg_input.py) to produce an `gt_image` tensor with more then two channels. 
-
-In addition, you will need to write new evaluation code. The current [evaluator file](../evals/kitti_evals.py) computes kitti scores which are only defined on binary segmentation problems. 
+However making this run is not to much of an afford. You will need to adapt `_make_data_gen` in the [input_producer](../inputs/kitti_seg_input.py) to produce an `gt_image` tensor with more then two channels. In addition, you will need to write new evaluation code. The current [evaluator file](../evals/kitti_evals.py) computes kitti scores which are only defined on binary segmentation problems. 
 
 Feel free to open a pull request if you find the time to implement those changes. I am also happy to help with any issues you might encounter.
-
-
-
-
-
-
 
