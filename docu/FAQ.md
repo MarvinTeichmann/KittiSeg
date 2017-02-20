@@ -18,3 +18,14 @@ However making this run is not to much of an afford. You will need to adapt `_ma
 
 Feel free to open a pull request if you find the time to implement those changes. I am also happy to help with any issues you might encounter.
 
+### How can I make a model trained on Kitti data perform better on non-kitti street images? ([Issue #14](https://github.com/MarvinTeichmann/KittiSeg/issues/14))
+
+Turn data augmentation on. The current version has all data augmentation turned of on default to perform well on the benchmark. This makes the trained model very sensitive to various aspects including lighting conditions and sharpness. Distortions, like random brightness, random resizing (including the change of aspect ratio) and even fancier thinks will force the ignore camera depended hints. Many common distortions are already in the [input-producer](https://github.com/MarvinTeichmann/KittiSeg/blob/master/inputs/kitti_seg_input.py), but turned of on default. 
+
+Alternative, consider training on your data (if possible) or apply fine-tuning using view labeled images of your data.
+
+
+
+
+
+
