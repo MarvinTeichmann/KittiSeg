@@ -184,7 +184,7 @@ def main(_):
     # Accept all pixel with conf >= 0.5 as positive prediction
     # This creates a `hard` prediction result for class street
     threshold = 0.5
-    street_prediction = output_image > 0.5
+    street_prediction = output_image > threshold
 
     # Plot the hard prediction as green overlay
     green_image = tv_utils.fast_overlay(image, street_prediction)
