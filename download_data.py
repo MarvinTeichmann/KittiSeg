@@ -31,7 +31,7 @@ sys.path.insert(1, 'incl')
 # correct URL.
 
 
-vgg_url = 'https://dl.dropboxusercontent.com/u/50333326/vgg16.npy'
+vgg_url = 'ftp://mi.eng.cam.ac.uk/pub/mttt2/models/vgg16.npy'
 
 
 def get_pathes():
