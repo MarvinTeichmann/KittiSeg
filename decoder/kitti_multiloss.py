@@ -63,8 +63,6 @@ def loss(hypes, decoded_logits, labels):
 
         softmax = tf.nn.softmax(logits) + epsilon
 
-        weight_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
-
         if hypes['loss'] == 'xentropy':
             cross_entropy_mean = _compute_cross_entropy_mean(hypes, labels,
                                                              softmax)
@@ -75,13 +73,10 @@ def loss(hypes, decoded_logits, labels):
             cross_entropy_mean = _compute_soft_ui(hypes, labels, softmax,
                                                   epsilon)
 
-        enc_loss = tf.add_n(tf.get_collection('losses'), name='total_loss')
-        dec_loss = tf.add_n(tf.get_collection('dec_losses'), name='total_loss')
-        fc_loss = tf.add_n(tf.get_collection('fc_wlosses'), name='total_loss')
-        if hypes['use_fc_wd']:
-            weight_loss = enc_loss + dec_loss
-        else:
-            weight_loss = enc_loss + dec_loss + fc_loss
+        reg_loss_col = tf.GraphKeys.REGULARIZATION_LOSSES
+
+        weight_loss = tf.add_n(tf.get_collection(reg_loss_col),
+                               name='reg_loss')
 
         total_loss = cross_entropy_mean + weight_loss
 
