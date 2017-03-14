@@ -2,10 +2,11 @@
   "model": {
     "input_file": "../inputs/kitti_seg_input.py",
     "architecture_file" : "../encoder/fcn8_vgg.py",
-    "objective_file" : "../decoder/kitti_multiloss.py",
+    "objective_file" : "../decoder/fcn.py",
     "optimizer_file" : "../optimizer/generic_optimizer.py",
     "evaluator_file" : "../evals/kitti_eval.py"
   },
+  
   "path": ["../incl"],
 
   "data": {
@@ -13,15 +14,15 @@
     "val_file" : "data_road/val3.txt",
     "road_color" : [255,0,255],
     "background_color" : [255,0,0],
-    "vgg_url": "ftp://mi.eng.cam.ac.uk/pub/mttt2/models/vgg16.npy",
+    "vgg_url": "https://dl.dropboxusercontent.com/u/50333326/vgg16.npy",
     "kitti_url": ""
   },
  
   "arch": {
-    "fcn_in": "fc7",
+    "fcn_in": "pool5",
     "num_classes" : 2,
     "image_size" : 50,
-    "weight": [1, 1],
+    "weight": [1, 2],
     "num_channels" : 3,
     "whitening": false
   },
@@ -36,17 +37,17 @@
     "max_crop": 32,
     "crop_chance": 0.8,
     "fix_shape": false,
-    "reseize_image": false,
+    "reseize_image": true,
     "image_height" : 384,
     "image_width" : 1248,
 
-    "augment_level": 0
+    "augment_level": 1
   },
 
   "logging": {
-    "display_iter": 20,
-    "eval_iter": 100,
-    "write_iter": 100,
+    "display_iter": 50,
+    "eval_iter": 250,
+    "write_iter": 250,
     "save_iter": 2000,
     "image_iter": 20000
   },
@@ -64,5 +65,6 @@
   "use_fc_wd": true,
   "loss": "xentropy",
   "clip_norm" : 1.0,
-  "wd": 5e-4
+  "wd": 5e-4,
+  "scale_down": 0.01
 }

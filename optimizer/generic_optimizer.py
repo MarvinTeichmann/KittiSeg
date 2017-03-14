@@ -84,4 +84,10 @@ def training(hypes, loss, global_step, learning_rate, opt=None):
 
         train_op = opt.apply_gradients(grads_and_vars, global_step=global_step)
 
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+
+        with tf.control_dependencies(update_ops):
+            train_op = opt.apply_gradients(grads_and_vars,
+                                           global_step=global_step)
+
     return train_op

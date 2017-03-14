@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Author: Marvin Teichmann
-
-
 """
 Detects Cars in an image using KittiSeg.
 
@@ -17,7 +11,13 @@ Usage:
 python demo.py --input_image data/demo.png [--output_image output_image]
                 [--logdir /path/to/weights] [--gpus 0]
 
+--------------------------------------------------------------------------------
 
+The MIT License (MIT)
+
+Copyright (c) 2017 Marvin Teichmann
+
+Details: https://github.com/MarvinTeichmann/KittiSeg/blob/master/LICENSE
 """
 from __future__ import absolute_import
 from __future__ import division

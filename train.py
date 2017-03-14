@@ -1,14 +1,21 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""
+Trains, evaluates and saves the KittiSeg model.
 
-"""Trains, evaluates and saves the KittiSeg model."""
+-------------------------------------------------
+
+The MIT License (MIT)
+
+Copyright (c) 2017 Marvin Teichmann
+
+More details: https://github.com/MarvinTeichmann/KittiSeg/blob/master/LICENSE
+"""
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
 import tensorflow as tf
 
-import json
+import commentjson
 import logging
 import os
 import sys
@@ -61,7 +68,7 @@ flags.DEFINE_string('name', None,
 flags.DEFINE_string('project', None,
                     'Append a name Tag to run.')
 
-flags.DEFINE_string('hypes', 'hypes/KittiSeg.json',
+flags.DEFINE_string('hypes', None,
                     'File storing model parameters.')
 
 flags.DEFINE_string('mod', None,
@@ -91,9 +98,14 @@ def main(_):
                       "'git submodule update --init --recursive'")
         exit(1)
 
+    if tf.app.flags.FLAGS.hypes is None:
+        logging.error("No hype file is given.")
+        logging.info("Usage: python train.py --hypes hypes/KittiClass.json")
+        exit(1)
+
     with open(tf.app.flags.FLAGS.hypes, 'r') as f:
         logging.info("f: %s", f)
-        hypes = json.load(f)
+        hypes = commentjson.load(f)
     utils.load_plugins()
 
     if tf.app.flags.FLAGS.mod is not None:

@@ -1,7 +1,14 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""
+An implementation of FCN in tensorflow.
+------------------------
 
-"""Trains, evaluates and saves the model network using a queue."""
+The MIT License (MIT)
+
+Copyright (c) 2016 Marvin Teichmann
+
+Details: https://github.com/MarvinTeichmann/KittiSeg/blob/master/LICENSE
+"""
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -38,8 +45,8 @@ def decoder(hypes, logits, train):
       logits: the logits are already decoded.
     """
     decoded_logits = {}
-    decoded_logits['logits'] = logits
-    decoded_logits['softmax'] = _add_softmax(hypes, logits)
+    decoded_logits['logits'] = logits['fcn_logits']
+    decoded_logits['softmax'] = _add_softmax(hypes, logits['fcn_logits'])
     return decoded_logits
 
 

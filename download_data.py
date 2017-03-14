@@ -84,7 +84,7 @@ def main():
 
     data_dir, run_dir = get_pathes()
 
-    vgg_weights = os.path.join(data_dir, 'vgg16.npy')
+    vgg_weights = os.path.join(data_dir, 'weights', 'vgg16.npy')
 
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
