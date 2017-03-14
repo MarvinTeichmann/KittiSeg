@@ -190,27 +190,44 @@ def jitter_input(hypes, image, gt_image):
     if jitter['random_crop'] and crop_chance > random.random():
         max_crop = jitter['max_crop']
         crop_chance = jitter['crop_chance']
-        image, gt_image = random_crop(image, gt_image, max_crop)
+        image, gt_image = random_crop_soft(image, gt_image, max_crop)
 
-    if jitter['fix_shape']:
-        image_height = jitter['image_height']
-        image_width = jitter['image_width']
-        assert not jitter['reseize_image']
-        image, gt_image = resize_label_image_with_pad(image, gt_image,
-                                                      image_height,
-                                                      image_width)
-    elif jitter['reseize_image']:
+    if jitter['reseize_image']:
         image_height = jitter['image_height']
         image_width = jitter['image_width']
         image, gt_image = resize_label_image(image, gt_image,
                                              image_height,
                                              image_width)
 
+    if jitter['crop_patch']:
+        patch_height = jitter['patch_height']
+        patch_width = jitter['patch_width']
+        image, gt_image = random_crop(image, gt_image,
+                                      patch_height, patch_width)
+
     assert(image.shape[:-1] == gt_image.shape[:-1])
     return image, gt_image
 
 
-def random_crop(image, gt_image, max_crop):
+def random_crop(image, gt_image, height, width):
+    old_width = image.shape[1]
+    old_height = image.shape[0]
+    assert(old_width >= width)
+    assert(old_height >= height)
+    max_x = max(old_height-height, 0)
+    max_y = max(old_width-width, 0)
+    offset_x = random.randint(0, max_x)
+    offset_y = random.randint(0, max_y)
+    image = image[offset_x:offset_x+height, offset_y:offset_y+width]
+    gt_image = gt_image[offset_x:offset_x+height, offset_y:offset_y+width]
+
+    assert(image.shape[0] == height)
+    assert(image.shape[1] == width)
+
+    return image, gt_image
+
+
+def random_crop_soft(image, gt_image, max_crop):
     offset_x = random.randint(1, max_crop)
     offset_y = random.randint(1, max_crop)
 
@@ -292,9 +309,16 @@ def create_queues(hypes, phase):
     arch = hypes['arch']
     dtypes = [tf.float32, tf.int32]
 
-    if hypes['jitter']['fix_shape']:
-        height = hypes['jitter']['image_height']
-        width = hypes['jitter']['image_width']
+    shape_known = hypes['jitter']['reseize_image'] \
+        or hypes['jitter']['crop_patch']
+
+    if shape_known:
+        if hypes['jitter']['crop_patch']:
+            height = hypes['jitter']['patch_height']
+            width = hypes['jitter']['patch_width']
+        else:
+            height = hypes['jitter']['image_height']
+            width = hypes['jitter']['image_width']
         channel = hypes['arch']['num_channels']
         num_classes = hypes['arch']['num_classes']
         shapes = [[height, width, channel],
@@ -432,13 +456,22 @@ def inputs(hypes, q, phase):
         label = tf.expand_dims(label, 0)
         return image, label
 
-    if not hypes['jitter']['fix_shape']:
+    shape_known = hypes['jitter']['reseize_image'] \
+        or hypes['jitter']['crop_patch']
+
+    if not shape_known:
         image, label = q.dequeue()
         nc = hypes["arch"]["num_classes"]
         label.set_shape([None, None, nc])
         image.set_shape([None, None, 3])
         image = tf.expand_dims(image, 0)
         label = tf.expand_dims(label, 0)
+        if hypes['solver']['batch_size'] > 1:
+            logging.error("Using a batch_size of {} with unknown shape."
+                          .format(hypes['solver']['batch_size']))
+            logging.error("Set batch_size to 1 or use `reseize_image` "
+                          "or `crop_patch` to obtain a defined shape")
+            raise ValueError
     else:
         image, label = q.dequeue_many(hypes['solver']['batch_size'])
 
