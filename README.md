@@ -33,9 +33,8 @@ Those modules can be installed using: `pip install numpy scipy pillow matplotlib
     
 Running the model using `demo.py` does not require you to download kitti data (step 3). Step 3 is only required if you want to train your own model using `train.py` or bench a model agains the official evaluation score `evaluate.py`. Also note, that I recommend using `download_data.py` instead of downloading the data yourself. The script will also extract and prepare the data. See Section [Manage data storage](README.md#manage-data-storage) if you like to control where the data is stored.
 
-##### Update KittiSeg
+##### To update an existing installation do:
 
-To update an existing installation do:
 1. Pull the code: `git pull`
 2. Update the submodules: `git submodule update --init --recursive`
 
