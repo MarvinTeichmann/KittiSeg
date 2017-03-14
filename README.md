@@ -35,8 +35,8 @@ Running the model using `demo.py` does not require you to download kitti data (s
 
 ##### To update an existing installation do:
 
-1. Pull the code: `git pull`
-2. Update the submodules: `git submodule update --init --recursive`
+1. Pull all patches: `git pull`
+2. Update all submodules: `git submodule update --init --recursive`
 
 If you forget the second step you might end up with an inconstant repository state. You will already have the new code for KittiSeg but run it old submodule versions code. This can work, but I do not run any tests to verify this.
 
