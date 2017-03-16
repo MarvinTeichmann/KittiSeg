@@ -44,7 +44,6 @@
     "reseize_image": true,
     "image_height" : 384,
     "image_width" : 1248,
-
     "augment_level": 1
   },
 
@@ -71,5 +70,6 @@
   "clip_norm" : 1.0,
   "wd": 5e-4,
   "load_pretrained": true,
+  "use_moving_average_bn": false,
   "scale_down": 0.5
 }
