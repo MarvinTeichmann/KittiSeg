@@ -19,8 +19,9 @@ The code requires [Tensorflow 1.0](https://www.tensorflow.org/install/) as well 
 * numpy
 * Pillow
 * scipy
+* commentjson
 
-Those modules can be installed using: `pip install numpy scipy pillow matplotlib` or `pip install -r requirements.txt`.
+Those modules can be installed using: `pip install numpy scipy pillow matplotlib commentjson` or `pip install -r requirements.txt`.
 
 
 ## Setup
