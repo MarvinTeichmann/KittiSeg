@@ -19,7 +19,7 @@
   },
  
   "arch": {
-    "layers": 101,
+    "layers": 50,
     "num_classes" : 2,
     "image_size" : 50,
     "weight": [1, 2],
