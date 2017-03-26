@@ -55,4 +55,7 @@ def inference(hypes, images, train=True):
 
     logits['fcn_logits'] = vgg_fcn.upscore32
 
+    logits['deep_feat'] = vgg_fcn.pool5
+    logits['early_feat'] = vgg_fcn.conv4_3
+
     return logits
