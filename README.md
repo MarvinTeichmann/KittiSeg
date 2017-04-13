@@ -13,7 +13,7 @@ The repository contains code for training, evaluating and visualizing semantic s
 
 ## Requirements
 
-The code requires [Tensorflow 1.0](https://www.tensorflow.org/install/) as well as the following python libraries: 
+The code requires [Tensorflow 1.0](https://www.tensorflow.org/install/), python 2.7 as well as the following python libraries: 
 
 * matplotlib
 * numpy
