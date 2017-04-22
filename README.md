@@ -105,7 +105,7 @@ KittiSeg is build on top of the TensorVision [TensorVision](https://github.com/T
 To utilize the entire TensorVision functionality install it using 
 
 `$ cd KittiSeg/submodules/TensorVision` <br>
-`$ python setup install`
+`$ python setup.py install`
 
 Now you can use the TensorVision command line tools, which includes:
 
