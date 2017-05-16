@@ -211,6 +211,17 @@ def main(_):
     logging.info("Green plot of predictions have been saved to: {}".format(
         os.path.realpath(green_image_name)))
 
+    logging.info("")
+    logging.warning("Do NOT use this Code to evaluate multiple images.")
+
+    logging.warning("Demo.py is **very slow** and designed "
+                    "to be a tutorial to show how the KittiSeg works.")
+    logging.warning("")
+    logging.warning("Please see this comment, if you like to apply demo.py to"
+                    "multiple images see:")
+    logging.warning("https://github.com/MarvinTeichmann/KittiBox/"
+                    "issues/15#issuecomment-301800058")
+
 
 if __name__ == '__main__':
     tf.app.run()
