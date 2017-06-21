@@ -51,8 +51,6 @@ def inference(hypes, images, train=True):
     logits['feed2'] = vgg_fcn.pool4
     logits['feed4'] = vgg_fcn.pool3
 
-    logits['feed4'] = vgg_fcn.pool3
-
     logits['fcn_logits'] = vgg_fcn.upscore32
 
     logits['deep_feat'] = vgg_fcn.pool5
