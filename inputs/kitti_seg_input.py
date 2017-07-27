@@ -167,10 +167,7 @@ def _make_data_gen(hypes, phase, data_dir):
         if phase == 'val':
             yield image, gt_image
         elif phase == 'train':
-
             yield jitter_input(hypes, image, gt_image)
-
-            yield jitter_input(hypes, np.fliplr(image), np.fliplr(gt_image))
 
 
 def jitter_input(hypes, image, gt_image):
