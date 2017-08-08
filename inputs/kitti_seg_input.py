@@ -129,9 +129,9 @@ def _make_data_gen(hypes, phase, data_dir):
     """Return a data generator that outputs image samples.
 
     @ Returns
-    image: integer array of shape [width, height, 3].
+    image: integer array of shape [height, width, 3].
     Representing RGB value of each pixel.
-    gt_image: boolean array of shape [width, height, num_classes].
+    gt_image: boolean array of shape [height, width, num_classes].
     Set `gt_image[i,j,k] == 1` if and only if pixel i,j
     is assigned class k. `gt_image[i,j,k] == 0` otherwise.
 
