@@ -136,7 +136,7 @@ def evaluate(hypes, sess, image_pl, inf_out):
 
         if phase == 'val':
             start_time = time.time()
-            for i in xrange(10):
+            for i in range(10):
                 sess.run([softmax], feed_dict=feed_dict)
             dt = (time.time() - start_time)/10
 
