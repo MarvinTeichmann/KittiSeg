@@ -352,7 +352,7 @@ def start_enqueuing_threads(hypes, q, phase, sess):
 
     enqueue_op = q.enqueue((image_pl, label_pl))
     gen = _make_data_gen(hypes, phase, data_dir)
-    gen.next()
+    next(gen)
     # sess.run(enqueue_op, feed_dict=make_feed(data))
     if phase == 'val':
         num_threads = 1
