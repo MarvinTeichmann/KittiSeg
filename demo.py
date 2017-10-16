@@ -82,12 +82,13 @@ def maybe_download_and_extract(runs_dir):
     if os.path.exists(logdir):
         # weights are downloaded. Nothing to do
         return
-
-    import zipfile
+      
+    if not os.path.exists(runs_dir):
+        os.makedirs(runs_dir)
     download_name = tv_utils.download(weights_url, runs_dir)
-
     logging.info("Extracting KittiSeg_pretrained.zip")
 
+    import zipfile
     zipfile.ZipFile(download_name, 'r').extractall(runs_dir)
 
     return
