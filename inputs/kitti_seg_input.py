@@ -442,8 +442,8 @@ def _processe_image(hypes, image):
         image = tf.image.random_brightness(image, max_delta=30)
         image = tf.image.random_contrast(image, lower=0.75, upper=1.25)
     if augment_level > 1:
-        image = tf.image.random_hue(image, max_delta=0.15)
-        image = tf.image.random_saturation(image, lower=0.5, upper=1.6)
+        image = tf.map_fn(lambda img: tf.image.random_hue(img, max_delta=0.15), image)
+        image = tf.map_fn(lambda img: tf.image.random_saturation(img, lower=0.5, upper=1.6), image)
 
     return image
 
