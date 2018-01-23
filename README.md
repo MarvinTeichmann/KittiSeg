@@ -8,7 +8,7 @@ KittiSeg performs segmentation of roads by utilizing an FCN based model. The mod
 
 The model is designed to perform well on small datasets. The training is done using just *250* densely labelled images. Despite this a state-of-the art MaxF1 score of over *96%* is achieved. The model is usable for real-time application. Inference can be performed at the impressive speed of *95ms* per image.
 
-The repository contains code for training, evaluating and visualizing semantic segmentation in TensorFlow. It is build to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) back end which allows to organize experiments in a very clean way. Also check out [KittiBox](https://github.com/MarvinTeichmann/KittiBox#kittibox) a similar projects to perform state-of-the art detection. And finally the [MultiNet](https://github.com/MarvinTeichmann/MultiNet) repository contains code to jointly train segmentation, classification and detection. KittiSeg and KittiBox are utilized as submodules in MultiNet.
+The repository contains code for training, evaluating and visualizing semantic segmentation in TensorFlow. It is built to be compatible with the [TensorVision](http://tensorvision.readthedocs.io/en/master/user/tutorial.html#workflow) back end which allows to organize experiments in a very clean way. Also check out [KittiBox](https://github.com/MarvinTeichmann/KittiBox#kittibox) a similar projects to perform state-of-the art detection. And finally the [MultiNet](https://github.com/MarvinTeichmann/MultiNet) repository contains code to jointly train segmentation, classification and detection. KittiSeg and KittiBox are utilized as submodules in MultiNet.
 
 
 ## Requirements
@@ -32,7 +32,7 @@ Those modules can be installed using: `pip install numpy scipy pillow matplotlib
     1. Retrieve kitti data url here: [http://www.cvlibs.net/download.php?file=data_road.zip](http://www.cvlibs.net/download.php?file=data_road.zip)
     2. Call `python download_data.py --kitti_url URL_YOU_RETRIEVED`
     
-Running the model using `demo.py` does not require you to download kitti data (step 3). Step 3 is only required if you want to train your own model using `train.py` or bench a model agains the official evaluation score `evaluate.py`. Also note, that I recommend using `download_data.py` instead of downloading the data yourself. The script will also extract and prepare the data. See Section [Manage data storage](README.md#manage-data-storage) if you like to control where the data is stored.
+Running the model using `demo.py` does not require you to download kitti data (step 3). Step 3 is only required if you want to train your own model using `train.py` or bench a model against the official evaluation score `evaluate.py`. Also note, that I recommend using `download_data.py` instead of downloading the data yourself. The script will also extract and prepare the data. See Section [Manage data storage](README.md#manage-data-storage) if you like to control where the data is stored.
 
 ##### To update an existing installation do:
 
@@ -99,7 +99,7 @@ Those modules operate independently. This allows easy experiments with different
 
 ## Utilize TensorVision backend
 
-KittiSeg is build on top of the TensorVision [TensorVision](https://github.com/TensorVision/TensorVision) backend. TensorVision modularizes computer vision training and helps organizing experiments. 
+KittiSeg is built on top of the TensorVision [TensorVision](https://github.com/TensorVision/TensorVision) backend. TensorVision modularizes computer vision training and helps organizing experiments. 
 
 
 To utilize the entire TensorVision functionality install it using 
