@@ -114,7 +114,7 @@ Now you can use the TensorVision command line tools, which includes:
 `tv-analyze --logdir PATH/TO/RUNDIR` evaluates the model in RUNDIR <br>
 
 
-## Useful Flags & Variabels
+## Useful Flags & Variables
 
 Here are some Flags which will be useful when working with KittiSeg and TensorVision. All flags are available across all scripts. 
 
